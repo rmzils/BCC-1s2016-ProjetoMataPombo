@@ -19,10 +19,10 @@ int main(){
   struct sockaddr_in vitima;
   char *ip = "127.0.0.1";
   char buf[MAXDATASIZE];
-  char message[1000];
+  char message[] = "Mensagem Recebida! \n";
+  // char message[1000];
 
   clock_t tInicio, tFim, tDecorrido;
-
   if(meuSocket < 0) {
     perror("Socket");
     exit(1);
@@ -44,32 +44,28 @@ int main(){
 	}
 
   while(1){
-    printf("Enter message : ");
-    fgets(message, 161, stdin);
-
-
-    if( send(meuSocket , message , strlen(message) , 0) < 0){
-        puts("Send failed");
-        return 1;
-    }
-    else {
-        tInicio = clock();
-        printf("Inicio: %Lf c", (long double)tInicio);
-    }
-
-    if ((numbytes=recv(meuSocket, buf, MAXDATASIZE, 0)) == -1){
+    // if ((numbytes = read(meuSocket,buf,strlen(MAXDATASIZE))) == -1){
+    if ((numbytes =recv(meuSocket, buf, MAXDATASIZE, 0)) == -1){
       perror("recv");
       exit(1);
     }
     else {
-      tFim = clock();
-      printf("Fim: %Lf \n", (long double)tFim);
-      tDecorrido = (tFim - tInicio);
-      printf("Diferença: %Lf \n", (long double)tDecorrido);
+      buf[numbytes] = '\0';
+      printf("Recebido: %s \n", buf);
+      if(write(meuSocket, message ,strlen(message)) < 0){
+      // if( send(meuSocket , message , strlen(message) , 0) < 0){
+          puts("Send failed");
+          return 1;
+      }
+      else {
+          tInicio = clock();
+          // printf("Inicio: %Lf ", (long double)tInicio);
+      }
+      // tFim = clock();
+      // printf("Fim: %Lf \n", (long double)tFim);
+      // tDecorrido = (tFim - tInicio);
+      // printf("Diferença: %Lf \n", (long double)tDecorrido);
     }
-
-    buf[numbytes] = '\0';
-    printf("Recebido: %s \n", buf);
   }
 
   close(meuSocket);
