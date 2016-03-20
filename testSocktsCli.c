@@ -8,7 +8,7 @@
 #include <netinet/in.h> // funções e tipos -
 #include <arpa/inet.h> // -de dados inet/arpa.
 #include <unistd.h> //funcao close
-#include<time.h>
+#include <time.h>
 
 #define MINHA_PORTA 20000
 #define MAXDATASIZE 10000
