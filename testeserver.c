@@ -95,6 +95,7 @@ int main(int arg, char *argv[]){
 		char client_message[2000];
 
 		time(&start_t);
+		printf("Envio de mensagem: ");
 		star = tempo();
 
 		if(send(new_socket, message, strlen(message), 0) < 0){
@@ -118,13 +119,14 @@ int main(int arg, char *argv[]){
     		printf("tempo de resposta exedido..\n");
     		break;
     	}
+			printf("Recebeu ACK: ");
 			fim = tempo();
 			diferenca = fim - star;
 			printf("Diferenca: %lf\t \n",diferenca);
-			media_tempo += diferenca;			
+			media_tempo += diferenca;
     	// media_tempo += difftime(time(NULL), start_t);
 
-    	printf("%s\n", client_message);
+    	// printf("%s\n", client_message);
 
 	}
 
