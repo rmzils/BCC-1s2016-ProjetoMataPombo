@@ -71,19 +71,12 @@ int main(int arg, char *argv[]){
 	for(fgets(message, 2000, stdin); strncmp(message, "close", 5) != 0; fgets(message, 2000, stdin), i++){
 		char client_message[2000];
 
-<<<<<<< HEAD
 		time(&resp_t);
 		start_t = tempo();
 
 		printf("Enviando mensagem...\n");
 
 		// Enviando mensagem ao cliente;
-=======
-		time(&start_t);
-		printf("Envio de mensagem: ");
-		star = tempo();
->>>>>>> origin/master
-
 		if(send(new_socket, message, strlen(message), 0) < 0){
 			printf("Erro no envio da mensagem\n");
 			break;
@@ -117,19 +110,8 @@ int main(int arg, char *argv[]){
     		printf("Tempo de resposta excedido...\n");
     		break;
     	}
-<<<<<<< HEAD
 
     	printf("Acknoledge recebido...\n");
-=======
-			printf("Recebeu ACK: ");
-			fim = tempo();
-			diferenca = fim - star;
-			printf("Diferenca: %lf\t \n",diferenca);
-			media_tempo += diferenca;
-    	// media_tempo += difftime(time(NULL), start_t);
-
-    	// printf("%s\n", client_message);
->>>>>>> origin/master
 
     	// Calcula diferenca de tempo entre o primeiro send e o tempo em que o ack foi recebido;
 		media_tempo += tempo() - start_t;

@@ -18,7 +18,7 @@ int main(int argc, char *argv[]){
 	if(socket_desc == -1)
 		printf("Nao foi possivel criar o socket.\n");
 
-    // Preparar o sockaddr_in / 
+    // Preparar o sockaddr_in /
 	server.sin_addr.s_addr = inet_addr("127.0.0.1");
 	server.sin_family = AF_INET;
 	server.sin_port = htons(8888);
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]){
 
 	printf("Conectado\n");
 
-	int read_size;     
+	int read_size;
     char *message = "ack", server_message[2000];
 
     // Fica esperando uma mensagem do servidor;
