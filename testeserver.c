@@ -8,166 +8,124 @@
 #include <time.h>
 #include <pthread.h>
 
-void *connection_handler(void *socket_desc);
 
 double tempo(){
- struct timeval tv;
- char buffer[30];
- time_t curtime;
+	struct timeval tv;
 
- gettimeofday(&tv, NULL);
+	gettimeofday(&tv, NULL);
 
- curtime=tv.tv_sec;
- strftime(buffer,30,"%m-%d-%Y  %T.",localtime(&curtime));
- printf("%s%d\n",buffer,tv.tv_usec);
-
- printf("segundos: %lf\t \n", tv.tv_sec + tv.tv_usec/1e6 );
-
- return tv.tv_sec + tv.tv_usec/1e6;
+	return tv.tv_sec + tv.tv_usec/1e6;
 }
 
 
 int main(int arg, char *argv[]){
 	int socket_desc, new_socket, c;
 	struct sockaddr_in server, client;
-	double star, fim, diferenca;
 
-	// Create socket
+	// Criar scoket / AF_NET = / SOCK_STREAM = / ;
 	socket_desc = socket(AF_INET, SOCK_STREAM, 0);
 
 	if(socket_desc < 0){
-		printf("Could not create socket\n");
+		printf("Nao foi possivel criar o socket.\n");
 		return 1;
 	}
 
-	// Prepare the sockaddr_in structure
+	// Preparar o sockaddr_in / ;
+	server.sin_addr.s_addr = inet_addr("127.0.0.1");
 	server.sin_family = AF_INET;
-	server.sin_addr.s_addr = INADDR_ANY;
 	server.sin_port = htons(8888);
 
+	// Fazendo do socket para torna-lo um servidor;
 	if(bind(socket_desc, (struct sockaddr *)&server, sizeof(server)) < 0){
-		printf("Bind failed\n");
+		printf("Falha no bind do server\n");
 		return 1;
 	}
 
-	printf("Bind done\n");
+	printf("Bind feito\n");
 
-	printf("Waiting for incoming connections...\n");
+	printf("Aguardando pedidos de conexao...\n");
+
+	// Aberto a tentativas de conexao de clientes;
 
 	listen(socket_desc, 3);
+
+	// Aceitar conexao;
 
 	c = sizeof(struct sockaddr_in);
 	new_socket = accept(socket_desc, (struct sockaddr *)&client, (socklen_t *)&c);
 
 	if(new_socket < 0){
-		printf("accept failed\n");
+		printf("Falha na aceitacao\n");
 		return 1;
 	}
 
-	printf("Connection accepted\n");
+	printf("Cliente conectado\n");
 
-	/*pthread_t sniffer_thread;
-    new_sock = malloc(1);
-    *new_sock = new_socket;
-
-	if(pthread_create(&sniffer_thread, NULL, connection_handler, (void*) new_sock) < 0){
-        printf("could not create thread\n");
-        return 1;
-    }
-
-    //Now join the thread , so that we dont terminate before the thread
-    //pthread_join( sniffer_thread , NULL);
-    printf("Handler assigned\n");
-
-    if(new_socket < 0){
-		printf("accept failed\n");
-		return 1;
-	}*/
-
-	double media_tempo = 0;
+	double media_tempo = 0, start_t;
 	int i = 0, read_size;
 	char message[2000];
+	time_t resp_t;
 
-	time_t start_t, end_t;
-	struct tm* formatted_time;
+	// Esperando entrada de texto do terminal;
 
 	for(fgets(message, 2000, stdin); strncmp(message, "close", 5) != 0; fgets(message, 2000, stdin), i++){
 		char client_message[2000];
 
-		time(&start_t);
-		star = tempo();
+		time(&resp_t);
+		start_t = tempo();
+
+		printf("Enviando mensagem...\n");
+
+		// Enviando mensagem ao cliente;
 
 		if(send(new_socket, message, strlen(message), 0) < 0){
-			printf("erro no envio da mensagem\n");
-			return 1;
+			printf("Erro no envio da mensagem\n");
+			break;
 		}
 
-		while(difftime(time(NULL), start_t) < 2.0 && (read_size = recv(new_socket, client_message, 2000, 0)) < 0){
+		// "verificar se o time() retorna uma variavel alocada";
+		// Espera o ack do cliente durante 2 segundos, enquanto isso continua tentando mandar a mensagem;
+		while(difftime(time(NULL), resp_t) < 2.0 && (read_size = recv(new_socket, client_message, 2000, 0)) < 0){
+			printf("tempo de espera: %lf\n", difftime(time(NULL), resp_t));
+
+			// Verifica se houve erro no envio da mensagem;
 			if(send(new_socket, message, strlen(message), 0) < 0){
-				printf("erro no envio da mensagem\n");
-				return 1;
+				printf("Erro no envio da mensagem\n");
+				break;
 			}
 		}
 
-		if(read_size == -1){
-        	printf("recv failed\n");
-        	return 1;
+		if(read_size == 0){
+			printf("Cliente desconectado\n");
+			break;
+		}
+
+		// Verifica se o erro foi no recv da mensagem;
+		if(read_size < 0){
+        	printf("Falha no recv\n");
+        	break;
     	}
 
+    	// Verifica se o erro foi no tempo de espera pelo ack;
     	if(difftime(time(NULL), start_t) > 2.0){
-    		printf("tempo de resposta exedido..\n");
+    		printf("Tempo de resposta excedido...\n");
     		break;
     	}
-			fim = tempo();
-			diferenca = fim - star;
-			printf("Diferenca: %lf\t \n",diferenca);
-			media_tempo += diferenca;			
-    	// media_tempo += difftime(time(NULL), start_t);
 
-    	printf("%s\n", client_message);
+    	printf("Acknoledge recebido...\n");
 
+    	// Calcula diferenca de tempo entre o primeiro send e o tempo em que o ack foi recebido;
+		media_tempo += tempo() - start_t;
+		printf("Tempo de resposta: %lf\t \n",tempo() - start_t);
 	}
 
+	// Se houve pelo menos 1 resposta, imprime a media do tempo;
 	if(i > 0){
-		printf("total: %lf, total/i: %lf\n",media_tempo, media_tempo/i);
+		media_tempo /= i;
+		printf("media de tempo: %lf\n", media_tempo);
 	}
 
 	close(socket_desc);
 
 	return 0;
 }
-
-/*void *connection_handler(void *socket_desc){
-    //Get the socket descriptor
-    int sock = *(int*)socket_desc;
-	int read_size;
-    char *message, client_message[2000];
-
-    //Send some messages to the client
-    message = "Greetings! I am your connection handler\n";
-    write(sock, message, strlen(message));
-
-    message = "Its my duty to communicate with you\n";
-    write(sock, message, strlen(message));
-
-    while((read_size = recv(sock, client_message, 2000 , 0)) > 0){
-        //Send the message back to client
-        printf("%s", client_message);
-    }
-
-    printf("entrou aqui\n");
-
-    if(read_size == 0){
-        puts("Client disconnected");
-        fflush(stdout);
-    }
-    else if(read_size == -1)
-    {
-        perror("recv failed");
-    }
-
-    //Free the socket pointer
-    free(socket_desc);
-
-    return 0;
-}*/
