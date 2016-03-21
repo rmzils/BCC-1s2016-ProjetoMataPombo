@@ -31,7 +31,7 @@ int main(int arg, char *argv[]){
 	}
 
 	// Preparar o sockaddr_in / ;
-	server.sin_addr.s_addr = inet_addr("127.0.0.1");
+	server.sin_addr.s_addr = INADDR_ANY;
 	server.sin_family = AF_INET;
 	server.sin_port = htons(8888);
 
@@ -116,6 +116,9 @@ int main(int arg, char *argv[]){
     	// Calcula diferenca de tempo entre o primeiro send e o tempo em que o ack foi recebido;
 		media_tempo += tempo() - start_t;
 		printf("Tempo de resposta: %lf\t \n",tempo() - start_t);
+
+		memset(message,0,strlen(message));
+		memset(message,0,strlen(message));
 	}
 
 	// Se houve pelo menos 1 resposta, imprime a media do tempo;
