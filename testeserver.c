@@ -111,14 +111,14 @@ int main(int arg, char *argv[]){
     		break;
     	}
 
-    	printf("Acknoledge recebido...\n");
+    	printf("Acknowledgment recebido.\n");
 
     	// Calcula diferenca de tempo entre o primeiro send e o tempo em que o ack foi recebido;
 		media_tempo += tempo() - start_t;
 		printf("Tempo de resposta: %lf\t \n",tempo() - start_t);
 
-		memset(message,0,strlen(message));
-		memset(message,0,strlen(message));
+		//strcpy(message,"");
+		//strcpy(client_message,"");
 	}
 
 	// Se houve pelo menos 1 resposta, imprime a media do tempo;

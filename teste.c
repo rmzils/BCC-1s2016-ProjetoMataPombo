@@ -39,6 +39,7 @@ int main(int argc, char *argv[]){
     // Fica esperando uma mensagem do servidor;
 	while((read_size = recv(socket_desc, server_message, 2000 , 0)) > 0){
         // Envia um ack para confirmacao do recebimento da mensagem;
+        server_message[read_size]='\0';
         printf("%s", server_message);
         if(send(socket_desc, message, strlen(message), 0) < 0)
         	printf("Erro no envio da mensagem\n");
