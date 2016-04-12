@@ -31,11 +31,11 @@ int main(int arg, char *argv[]){
 	}
 
 	// Preparar o sockaddr_in / ;
-	server.sin_addr.s_addr = INADDR_ANY;
-	server.sin_family = AF_INET;
-	server.sin_port = htons(8888);
+	server.sin_addr.s_addr = INADDR_ANY; /* IP do Host */
+	server.sin_family = AF_INET; /* Familia do endereco usando: (ARPA INTERNET PROTOCOLS) */
+	server.sin_port = htons(8888); /* Numero da porta */
 
-	// Fazendo do socket para torna-lo um servidor;
+	// Fazendo bind do socket para torna-lo um servidor;
 	if(bind(socket_desc, (struct sockaddr *)&server, sizeof(server)) < 0){
 		printf("Falha no bind do server\n");
 		return 1;
