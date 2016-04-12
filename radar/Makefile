@@ -15,7 +15,7 @@ _SRC=cliente.c
 SRC=$(patsubst %,$(SDIR)/%,$(_SRC))
 
 #nome do meu exe
-EXECUTABLE=matapombo
+EXECUTABLE=matapomboradar
 
 all:
 	$(CC) -Wall $(CFLAGS) $(IDIR) $(SRC) -o $(EXECUTABLE) $(LIBS)
