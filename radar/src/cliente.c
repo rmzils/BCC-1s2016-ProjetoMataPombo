@@ -7,10 +7,54 @@
 #include <unistd.h>
 #include <time.h>
 #include <pthread.h>
-
+#include <pthread.h>
+//só tipos:
+#include "definicoes.h"
 #include "aviao.h"
+#include "movimentoaviao.h"
+
+//metodos:
+#include "estatistica.h"
+
+
 
 int main(int argc, char *argv[]){
+
+	aviao pombo;
+	movimentoAviao movimentoPombo;
+
+	//angulo e posição do pombo
+	randomPosicaoAviao(&pombo, &movimentoPombo);
+
+	printf("pombo.anguloDirecao: %f\n",pombo.anguloDirecao );
+	printf("posicao x:%.3f - y:%.3f - z:%.3f\n", pombo.posX, pombo.posY, pombo.posZ );
+	printf("velc: %.2f - tipo traj: %d\n", pombo.velocidade, pombo.tipoTrajetoria);;
+
+
+	float aux = difftime(time(NULL), pombo.tempoDeVoo);
+	while (1) {
+		if (difftime(time(NULL), pombo.tempoDeVoo) > aux) {
+			calculandoProximoPonto(&pombo, &movimentoPombo);
+
+			printf("############################################################\n");
+
+			printf("pontoInicialAviao: %.3f - %.3f\n", movimentoPombo.pontoInicialAviao[0], movimentoPombo.pontoInicialAviao[1] );
+			printf("pontoCentroRadar: %.3f - %.3f\n", movimentoPombo.pontoCentroRadar[0], movimentoPombo.pontoCentroRadar[1] );
+			printf("pontoCatetos: %.3f - %.3f\n", movimentoPombo.pontoCatetos[0], movimentoPombo.pontoCatetos[1] );
+			printf("FINALMETE: pontoHipotenusa: %.3f - %.3f\n", movimentoPombo.pontoHipotenusa[0], movimentoPombo.pontoHipotenusa[1] );
+
+			printf("tamanhoHipotenusa: %.3f \n", movimentoPombo.tamanhoHipotenusa );
+			printf("tamanhoCatetoAdjacente: %.3f\n", movimentoPombo.tamanhoCatetoAdjacente);
+			printf("tamanhoCatetoOposto: %.3f \n", movimentoPombo.tamanhoCatetoOposto );
+
+			printf("############################################################\n\n\n");
+
+			aux = difftime(time(NULL), pombo.tempoDeVoo);
+		}
+	}
+
+
+
 	int socket_desc;
 	struct sockaddr_in server;
 
@@ -40,6 +84,9 @@ int main(int argc, char *argv[]){
 
     // Fica esperando uma mensagem do servidor;
 	while((read_size = recv(socket_desc, server_message, 2000 , 0)) > 0){
+
+
+
         // Envia um ack para confirmacao do recebimento da mensagem;
         server_message[read_size]='\0';
         printf("%s", server_message);

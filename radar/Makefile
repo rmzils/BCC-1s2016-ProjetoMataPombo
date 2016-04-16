@@ -10,7 +10,7 @@ CC=gcc
 CFLAGS= -std=c99
 
 # todas as minhas .c
-_SRC=cliente.c
+_SRC=cliente.c estatistica.c movimentoaviao.c
 
 SRC=$(patsubst %,$(SDIR)/%,$(_SRC))
 

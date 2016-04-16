@@ -2,10 +2,12 @@
 #define __ESTRUTURA_AVIAO_H__
 
 typedef struct {
-  float posX, posY, posZ; // Escala para redimensionamento da tela
+  float posX, posY, posZ;
   float velocidade;
   int altitude;
-  int tipoTragetoria;
-} aviao;
+  float anguloDirecao;
+  int tipoTrajetoria;
+  time_t tempoDeVoo;
+}aviao;
 
 #endif
