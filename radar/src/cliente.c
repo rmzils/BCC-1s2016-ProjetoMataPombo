@@ -7,16 +7,23 @@
 #include <unistd.h>
 #include <time.h>
 #include <pthread.h>
-#include <pthread.h>
+#include <sys/time.h>
 //só tipos:
 #include "definicoes.h"
 #include "aviao.h"
 #include "movimentoaviao.h"
-
 //metodos:
 #include "estatistica.h"
 
 
+
+double tempo(){
+	struct timeval tv;
+
+	gettimeofday(&tv, NULL);
+
+	return tv.tv_sec + tv.tv_usec/1e6;
+}
 
 int main(int argc, char *argv[]){
 
@@ -30,30 +37,65 @@ int main(int argc, char *argv[]){
 	printf("posicao x:%.3f - y:%.3f - z:%.3f\n", pombo.posX, pombo.posY, pombo.posZ );
 	printf("velc: %.2f - tipo traj: %d\n", pombo.velocidade, pombo.tipoTrajetoria);;
 
+	double tempoNovo, tempoAntigo;
+	tempoAntigo = tempo();
 
-	float aux = difftime(time(NULL), pombo.tempoDeVoo);
 	while (1) {
-		if (difftime(time(NULL), pombo.tempoDeVoo) > aux) {
-			calculandoProximoPonto(&pombo, &movimentoPombo);
+		tempoNovo = tempo();
+		if ((tempoNovo - tempoAntigo) > 0.5) {
 
-			printf("############################################################\n");
+			if (pombo.tempoDeVoo > pombo.tempoMudancaTrajetoria) {
 
-			printf("pontoInicialAviao: %.3f - %.3f\n", movimentoPombo.pontoInicialAviao[0], movimentoPombo.pontoInicialAviao[1] );
-			printf("pontoCentroRadar: %.3f - %.3f\n", movimentoPombo.pontoCentroRadar[0], movimentoPombo.pontoCentroRadar[1] );
-			printf("pontoCatetos: %.3f - %.3f\n", movimentoPombo.pontoCatetos[0], movimentoPombo.pontoCatetos[1] );
-			printf("FINALMETE: pontoHipotenusa: %.3f - %.3f\n", movimentoPombo.pontoHipotenusa[0], movimentoPombo.pontoHipotenusa[1] );
+				direcaoAoAlvo(&pombo, &movimentoPombo);
+				printf("ACABOOOU!\n");
+			}
+			else {
+				pombo.tempoDeVoo += tempoNovo - tempoAntigo;
+				printf("%.5f\n", pombo.tempoDeVoo );
+				tempoAntigo = tempoNovo;
+				tempoNovo = tempo();
 
-			printf("tamanhoHipotenusa: %.3f \n", movimentoPombo.tamanhoHipotenusa );
-			printf("tamanhoCatetoAdjacente: %.3f\n", movimentoPombo.tamanhoCatetoAdjacente);
-			printf("tamanhoCatetoOposto: %.3f \n", movimentoPombo.tamanhoCatetoOposto );
+				calculandoProximoPonto(&pombo, &movimentoPombo);
 
-			printf("############################################################\n\n\n");
+				printf("############################################################\n");
 
-			aux = difftime(time(NULL), pombo.tempoDeVoo);
+				printf("pontoInicialAviao: %.3f - %.3f\n", movimentoPombo.pontoInicialAviao[0], movimentoPombo.pontoInicialAviao[1] );
+				printf("pontoCentroRadar: %.3f - %.3f\n", movimentoPombo.pontoCentroRadar[0], movimentoPombo.pontoCentroRadar[1] );
+				printf("pontoCatetos: %.3f - %.3f\n", movimentoPombo.pontoCatetos[0], movimentoPombo.pontoCatetos[1] );
+				printf("FINALMETE: pontoHipotenusa: %.3f - %.3f\n", movimentoPombo.pontoHipotenusa[0], movimentoPombo.pontoHipotenusa[1] );
+
+				printf("tamanhoHipotenusa: %.3f \n", movimentoPombo.tamanhoHipotenusa );
+				printf("tamanhoCatetoAdjacente: %.3f\n", movimentoPombo.tamanhoCatetoAdjacente);
+				printf("tamanhoCatetoOposto: %.3f \n", movimentoPombo.tamanhoCatetoOposto );
+
+				printf("############################################################\n\n");
+			}
 		}
 	}
 
-
+	// while (1) {
+	// 	if (difftime(time(NULL), pombo.tempoDeVoo) != pombo.tempoMudancaTrajetoria) {
+	//
+	// 		if (difftime(time(NULL), pombo.tempoDeVoo) > aux) {
+	// 			calculandoProximoPonto(&pombo, &movimentoPombo);
+	//
+	// 			printf("############################################################\n");
+	//
+	// 			printf("pontoInicialAviao: %.3f - %.3f\n", movimentoPombo.pontoInicialAviao[0], movimentoPombo.pontoInicialAviao[1] );
+	// 			printf("pontoCentroRadar: %.3f - %.3f\n", movimentoPombo.pontoCentroRadar[0], movimentoPombo.pontoCentroRadar[1] );
+	// 			printf("pontoCatetos: %.3f - %.3f\n", movimentoPombo.pontoCatetos[0], movimentoPombo.pontoCatetos[1] );
+	// 			printf("FINALMETE: pontoHipotenusa: %.3f - %.3f\n", movimentoPombo.pontoHipotenusa[0], movimentoPombo.pontoHipotenusa[1] );
+	//
+	// 			printf("tamanhoHipotenusa: %.3f \n", movimentoPombo.tamanhoHipotenusa );
+	// 			printf("tamanhoCatetoAdjacente: %.3f\n", movimentoPombo.tamanhoCatetoAdjacente);
+	// 			printf("tamanhoCatetoOposto: %.3f \n", movimentoPombo.tamanhoCatetoOposto );
+	//
+	// 			printf("############################################################\n\n");
+	//
+	// 			aux = difftime(time(NULL), pombo.tempoDeVoo);
+	// 		}
+	// 	}
+	// }
 
 	int socket_desc;
 	struct sockaddr_in server;

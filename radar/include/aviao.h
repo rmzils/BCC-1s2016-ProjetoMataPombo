@@ -7,7 +7,8 @@ typedef struct {
   int altitude;
   float anguloDirecao;
   int tipoTrajetoria;
-  time_t tempoDeVoo;
+  float tempoMudancaTrajetoria;
+  float tempoDeVoo;
 }aviao;
 
 #endif

@@ -14,6 +14,14 @@ float converterGrausEmradianus(float grau){
   return radiano;
 }
 
+//------------------------------------------------------------------------------
+float randomTempoMudancaTrajetoria(){
+
+  return 3.5;
+
+}
+
+//------------------------------------------------------------------------------
 float randomAnguloDirecaoPombo(){
 
   float anguloDirecao;
@@ -40,7 +48,7 @@ void randomTrajetoriaAviao( aviao *pombo, movimentoAviao *movimentoPombo ){
     pombo->posZ = 200;
     pombo->velocidade = 66.6667;
 
-    pombo->anguloDirecao = 0;
+    pombo->anguloDirecao = converterGrausEmradianus(0);
     pombo->tipoTrajetoria = tipoTrajetoria;
   }
   else {
@@ -69,16 +77,24 @@ void randomPosicaoAviao( aviao *pombo, movimentoAviao *movimentoPombo ){
   movimentoPombo->pontoCentroRadar[0] = POSXRADAR;
   movimentoPombo->pontoCentroRadar[1] = POSYRADAR;
 
-  time(&pombo->tempoDeVoo);
+  pombo->tempoDeVoo = 0;
 
   // printf("angulo sorteado: %d \npos. ini. aviao X: %f - pos. ini. aviao X: %f \n",angulo, pombo->posX, pombo->posY );
 
   randomTrajetoriaAviao( pombo, movimentoPombo );
+
+  pombo->tempoMudancaTrajetoria = randomTempoMudancaTrajetoria();
+}
+//------------------------------------------------------------------------------
+void direcaoAoAlvo( aviao *pombo, movimentoAviao *movimentoPombo ){
+
+  pombo->posZ = 200;
+  pombo->velocidade = 66.6667;
+  pombo->anguloDirecao = 0;
+  pombo->tipoTrajetoria = 1;
+  pombo->anguloDirecao = converterGrausEmradianus(0);
+  pombo->tempoMudancaTrajetoria = 999999999;
+
 }
 
-
-// //------------------------------------------------------------------------------
-// float randomTempoMudancaTrajetoria(){
-//
-// }
-// //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------

@@ -7,7 +7,7 @@
 
 void randomPosicaoAviao( aviao *pombo, movimentoAviao *movimentoPombo );
 void randomTrajetoriaAviao( aviao *pombo, movimentoAviao *movimentoPombo );
-
+void direcaoAoAlvo( aviao *pombo, movimentoAviao *movimentoPombo );
 float randomTempoMudancaTrajetoria();
 
 #endif

@@ -54,7 +54,7 @@ void calcularVetorCatetoAdjacente( aviao *pombo, movimentoAviao *movimentoPombo 
 
 //------------------------------------------------------------------------------
 void calculoTamanhoTriangulo( aviao *pombo, movimentoAviao *movimentoPombo ){
-  movimentoPombo->tamanhoHipotenusa      = 0 + pombo->velocidade * difftime(time(NULL), pombo->tempoDeVoo);
+  movimentoPombo->tamanhoHipotenusa      = 0 + (pombo->velocidade * pombo->tempoDeVoo);
   movimentoPombo->tamanhoCatetoAdjacente = movimentoPombo->tamanhoHipotenusa * cos( pombo->anguloDirecao );
   movimentoPombo->tamanhoCatetoOposto    = movimentoPombo->tamanhoHipotenusa * sin( pombo->anguloDirecao );
   calcularVetorCatetoAdjacente( pombo, movimentoPombo );
@@ -64,3 +64,5 @@ void calculoTamanhoTriangulo( aviao *pombo, movimentoAviao *movimentoPombo ){
 void calculandoProximoPonto( aviao *pombo, movimentoAviao *movimentoPombo ){
    calculoTamanhoTriangulo( pombo, movimentoPombo );
 }
+
+//------------------------------------------------------------------------------
