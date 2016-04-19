@@ -33,6 +33,7 @@ int main(int argc, char *argv[]){
 	//angulo e posição do pombo
 	randomPosicaoAviao(&pombo, &movimentoPombo);
 
+	printf("tempo mudanca: %f\n",pombo.tempoMudancaTrajetoria);
 	printf("pombo.anguloDirecao: %f\n",pombo.anguloDirecao );
 	printf("posicao x:%.3f - y:%.3f - z:%.3f\n", pombo.posX, pombo.posY, pombo.posZ );
 	printf("velc: %.2f - tipo traj: %d\n", pombo.velocidade, pombo.tipoTrajetoria);;
