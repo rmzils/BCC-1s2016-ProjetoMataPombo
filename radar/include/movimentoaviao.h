@@ -20,5 +20,6 @@ typedef struct {
 }movimentoAviao;
 
 void calculandoProximoPonto( aviao *pombo, movimentoAviao *movimentoPombo );
+char* strInfPombo( aviao *pombo, movimentoAviao *movimentoPombo );
 
 #endif

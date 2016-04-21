@@ -9,6 +9,7 @@
 
 //------------------------------------------------------------------------------
 float converterGrausEmradianus(float grau){
+  printf("GRAU: %.2f\n",grau );
   float radiano;
   radiano = grau * ( 3.14159265359 / 180 );
   return radiano;
@@ -112,7 +113,8 @@ void randomPosicaoAviao( aviao *pombo, movimentoAviao *movimentoPombo ){
 }
 //------------------------------------------------------------------------------
 void direcaoAoAlvo( aviao *pombo, movimentoAviao *movimentoPombo ){
-
+  movimentoPombo->pontoInicialAviao[0] = pombo->posX;
+  movimentoPombo->pontoInicialAviao[1] = pombo->posY;
   pombo->posZ = 200;
   pombo->velocidade = 66.6667;
   pombo->tipoTrajetoria = 1;

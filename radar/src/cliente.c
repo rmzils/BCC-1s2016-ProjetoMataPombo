@@ -15,13 +15,9 @@
 //metodos:
 #include "estatistica.h"
 
-
-
 double tempo(){
 	struct timeval tv;
-
 	gettimeofday(&tv, NULL);
-
 	return tv.tv_sec + tv.tv_usec/1e6;
 }
 
@@ -41,12 +37,13 @@ int main(int argc, char *argv[]){
 	double tempoNovo, tempoAntigo;
 	tempoAntigo = tempo();
 
+	char *str;
+
 	while (1) {
 		tempoNovo = tempo();
-		if ((tempoNovo - tempoAntigo) > 0.5) {
+		if ((tempoNovo - tempoAntigo) > TOLERANCIA ) {
 
 			if (pombo.tempoDeVoo > pombo.tempoMudancaTrajetoria) {
-
 				direcaoAoAlvo(&pombo, &movimentoPombo);
 				printf("ACABOOOU!\n");
 			}
@@ -59,6 +56,11 @@ int main(int argc, char *argv[]){
 				calculandoProximoPonto(&pombo, &movimentoPombo);
 
 				printf("############################################################\n");
+
+				str = strInfPombo( &pombo, &movimentoPombo );
+				printf("-->> %s\n\n\n", str);
+				// printf("-->> %s\n", movimentoPombo.srtMensagem);
+				free(str);
 
 				printf("pontoInicialAviao: %.3f - %.3f\n", movimentoPombo.pontoInicialAviao[0], movimentoPombo.pontoInicialAviao[1] );
 				printf("pontoCentroRadar: %.3f - %.3f\n", movimentoPombo.pontoCentroRadar[0], movimentoPombo.pontoCentroRadar[1] );
@@ -123,12 +125,10 @@ int main(int argc, char *argv[]){
 	printf("Conectado\n");
 
 	int read_size;
-    char *message = "ack", server_message[2000];
+  char *message = "ack", server_message[2000];
 
     // Fica esperando uma mensagem do servidor;
 	while((read_size = recv(socket_desc, server_message, 2000 , 0)) > 0){
-
-
 
         // Envia um ack para confirmacao do recebimento da mensagem;
         server_message[read_size]='\0';

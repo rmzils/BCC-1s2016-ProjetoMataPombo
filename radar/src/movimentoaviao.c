@@ -2,23 +2,43 @@
 #include <time.h>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
+#include <math.h>
 
 #include "definicoes.h"
 #include "estatistica.h"
 #include "aviao.h"
 
 //------------------------------------------------------------------------------
-float modulo(float num){
-  if (num < 0) {
-    num = num * (-1);
-  }
-  return num;
+char* strInfPombo( aviao *pombo, movimentoAviao *movimentoPombo ){
+
+  char *strMensagem = "";
+  strMensagem = malloc( 100 * sizeof (char) );
+  strMensagem[0] = '\0';
+  char strPX[60], strPY[60], strPZ[60];
+
+  sprintf(strPX, "%.7f", pombo->posX);
+  sprintf(strPY, "%.7f", pombo->posY);
+  sprintf(strPZ, "%.7f", pombo->posZ);
+
+  strcat(strMensagem, strPX);
+  strcat(strMensagem, "#");
+  strcat(strMensagem, strPY);
+  strcat(strMensagem, "#");
+  strcat(strMensagem, strPZ);
+  strcat(strMensagem, "#");
+
+  return strMensagem;
 }
 
 //------------------------------------------------------------------------------
 void calcularPontoAdjacente( aviao *pombo, movimentoAviao *movimentoPombo ){
   movimentoPombo->pontoHipotenusa[0] = movimentoPombo->pontoCatetos[0] + movimentoPombo->tamanhoCatetoOposto * movimentoPombo->vetorCatetoOposto[0];
   movimentoPombo->pontoHipotenusa[1] = movimentoPombo->pontoCatetos[1] + movimentoPombo->tamanhoCatetoOposto * movimentoPombo->vetorCatetoOposto[1];
+
+  pombo->posX = movimentoPombo->pontoHipotenusa[0];
+  pombo->posY = movimentoPombo->pontoHipotenusa[1];
+
 }
 
 //------------------------------------------------------------------------------
@@ -42,14 +62,24 @@ void calcularVetorCatetoOposto( aviao *pombo, movimentoAviao *movimentoPombo ){
 void calcularPontoCatetos( aviao *pombo, movimentoAviao *movimentoPombo ){
   movimentoPombo->pontoCatetos[0] = movimentoPombo->pontoInicialAviao[0] + movimentoPombo->tamanhoCatetoAdjacente * movimentoPombo->vetorCatetoAdjacente[0];
   movimentoPombo->pontoCatetos[1] = movimentoPombo->pontoInicialAviao[1] + movimentoPombo->tamanhoCatetoAdjacente * movimentoPombo->vetorCatetoAdjacente[1];
+
+  if ( movimentoPombo->anguloTeta == 0 ) {
+    movimentoPombo->pontoHipotenusa[0] = movimentoPombo->pontoCatetos[0];
+    movimentoPombo->pontoHipotenusa[1] = movimentoPombo->pontoCatetos[1];
+    pombo->posX = movimentoPombo->pontoHipotenusa[0];
+    pombo->posY = movimentoPombo->pontoHipotenusa[1];
+    return;
+  }
+
   calcularVetorCatetoOposto( pombo, movimentoPombo );
 }
 
 //------------------------------------------------------------------------------
 void calcularVetorCatetoAdjacente( aviao *pombo, movimentoAviao *movimentoPombo ){
-  movimentoPombo->vetorCatetoAdjacente[0] = ((movimentoPombo->pontoInicialAviao[0] - POSXRADAR )/(modulo(movimentoPombo->pontoInicialAviao[0] - POSXRADAR)));
-  movimentoPombo->vetorCatetoAdjacente[1] = ((movimentoPombo->pontoInicialAviao[1] - POSYRADAR )/(modulo(movimentoPombo->pontoInicialAviao[1] - POSYRADAR)));
-  calcularPontoCatetos( pombo,movimentoPombo );
+  float escalar = (sqrt((POSXRADAR - movimentoPombo->pontoInicialAviao[0])*(POSXRADAR - movimentoPombo->pontoInicialAviao[0]) + (POSYRADAR - movimentoPombo->pontoInicialAviao[1])*(POSYRADAR - movimentoPombo->pontoInicialAviao[1])));
+  movimentoPombo->vetorCatetoAdjacente[0] = ((POSXRADAR - movimentoPombo->pontoInicialAviao[0])/(escalar));
+  movimentoPombo->vetorCatetoAdjacente[1] = ((POSYRADAR - movimentoPombo->pontoInicialAviao[1])/(escalar));
+  calcularPontoCatetos( pombo, movimentoPombo );
 }
 
 //------------------------------------------------------------------------------
