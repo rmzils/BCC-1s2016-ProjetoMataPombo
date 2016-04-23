@@ -8,15 +8,11 @@
 #include <time.h>
 #include <pthread.h>
 
-
 double tempo(){
 	struct timeval tv;
-
 	gettimeofday(&tv, NULL);
-
 	return tv.tv_sec + tv.tv_usec/1e6;
 }
-
 
 int main(int arg, char *argv[]){
 	int socket_desc, new_socket, c;

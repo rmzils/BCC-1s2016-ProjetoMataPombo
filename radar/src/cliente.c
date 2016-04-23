@@ -29,15 +29,10 @@ int main(int argc, char *argv[]){
 	//angulo e posição do pombo
 	randomPosicaoAviao(&pombo, &movimentoPombo);
 
-	printf("tempo mudanca: %f\n",pombo.tempoMudancaTrajetoria);
-	printf("pombo.anguloDirecao: %f\n",pombo.anguloDirecao );
-	printf("posicao x:%.3f - y:%.3f - z:%.3f\n", pombo.posX, pombo.posY, pombo.posZ );
-	printf("velc: %.2f - tipo traj: %d\n", pombo.velocidade, pombo.tipoTrajetoria);;
-
 	double tempoNovo, tempoAntigo;
 	tempoAntigo = tempo();
 
-	char *str;
+	char *strMensagem;
 
 	while (1) {
 		tempoNovo = tempo();
@@ -48,57 +43,25 @@ int main(int argc, char *argv[]){
 				printf("ACABOOOU!\n");
 			}
 			else {
+				system("clear");
 				pombo.tempoDeVoo += tempoNovo - tempoAntigo;
 				printf("%.5f\n", pombo.tempoDeVoo );
 				tempoAntigo = tempoNovo;
 				tempoNovo = tempo();
-
+				strMensagem = strInfPombo( &pombo, &movimentoPombo );
+				printf("Mensagem: %s\n\n\n", strMensagem);
+				free(strMensagem);
 				calculandoProximoPonto(&pombo, &movimentoPombo);
 
 				printf("############################################################\n");
-
-				str = strInfPombo( &pombo, &movimentoPombo );
-				printf("-->> %s\n\n\n", str);
-				// printf("-->> %s\n", movimentoPombo.srtMensagem);
-				free(str);
-
-				printf("pontoInicialAviao: %.3f - %.3f\n", movimentoPombo.pontoInicialAviao[0], movimentoPombo.pontoInicialAviao[1] );
-				printf("pontoCentroRadar: %.3f - %.3f\n", movimentoPombo.pontoCentroRadar[0], movimentoPombo.pontoCentroRadar[1] );
-				printf("pontoCatetos: %.3f - %.3f\n", movimentoPombo.pontoCatetos[0], movimentoPombo.pontoCatetos[1] );
-				printf("FINALMETE: pontoHipotenusa: %.3f - %.3f\n", movimentoPombo.pontoHipotenusa[0], movimentoPombo.pontoHipotenusa[1] );
-
-				printf("tamanhoHipotenusa: %.3f \n", movimentoPombo.tamanhoHipotenusa );
-				printf("tamanhoCatetoAdjacente: %.3f\n", movimentoPombo.tamanhoCatetoAdjacente);
-				printf("tamanhoCatetoOposto: %.3f \n", movimentoPombo.tamanhoCatetoOposto );
-
+				printf("Ponto Avião: %.3f - %.3f\n", movimentoPombo.pontoHipotenusa[0], movimentoPombo.pontoHipotenusa[1] );
+				printf("tempo mudanca: %f\n",pombo.tempoMudancaTrajetoria);
+				printf("pombo.anguloDirecao: %f\n",pombo.anguloDirecao );
+				printf("velc: %.2f - tipo traj: %d\n", pombo.velocidade, pombo.tipoTrajetoria);;
 				printf("############################################################\n\n");
 			}
 		}
 	}
-
-	// while (1) {
-	// 	if (difftime(time(NULL), pombo.tempoDeVoo) != pombo.tempoMudancaTrajetoria) {
-	//
-	// 		if (difftime(time(NULL), pombo.tempoDeVoo) > aux) {
-	// 			calculandoProximoPonto(&pombo, &movimentoPombo);
-	//
-	// 			printf("############################################################\n");
-	//
-	// 			printf("pontoInicialAviao: %.3f - %.3f\n", movimentoPombo.pontoInicialAviao[0], movimentoPombo.pontoInicialAviao[1] );
-	// 			printf("pontoCentroRadar: %.3f - %.3f\n", movimentoPombo.pontoCentroRadar[0], movimentoPombo.pontoCentroRadar[1] );
-	// 			printf("pontoCatetos: %.3f - %.3f\n", movimentoPombo.pontoCatetos[0], movimentoPombo.pontoCatetos[1] );
-	// 			printf("FINALMETE: pontoHipotenusa: %.3f - %.3f\n", movimentoPombo.pontoHipotenusa[0], movimentoPombo.pontoHipotenusa[1] );
-	//
-	// 			printf("tamanhoHipotenusa: %.3f \n", movimentoPombo.tamanhoHipotenusa );
-	// 			printf("tamanhoCatetoAdjacente: %.3f\n", movimentoPombo.tamanhoCatetoAdjacente);
-	// 			printf("tamanhoCatetoOposto: %.3f \n", movimentoPombo.tamanhoCatetoOposto );
-	//
-	// 			printf("############################################################\n\n");
-	//
-	// 			aux = difftime(time(NULL), pombo.tempoDeVoo);
-	// 		}
-	// 	}
-	// }
 
 	int socket_desc;
 	struct sockaddr_in server;
@@ -110,7 +73,7 @@ int main(int argc, char *argv[]){
 		printf("Nao foi possivel criar o socket.\n");
 
     // Preparar o sockaddr_in /
-	server.sin_addr.s_addr = inet_addr("169.254.203.108"); /* IP do Host */
+	server.sin_addr.s_addr = inet_addr("10.10.10.105"); /* IP do Host */
 	server.sin_family = AF_INET; /* Familia do endereco usando: (ARPA INTERNET PROTOCOLS) */
 	server.sin_port = htons(8888); /* Numero da porta */
 
