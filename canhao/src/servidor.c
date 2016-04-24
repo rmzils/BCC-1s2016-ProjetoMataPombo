@@ -8,6 +8,9 @@
 #include <time.h>
 #include <pthread.h>
 
+#include "calculos.h"
+#include "projetil.h"
+
 double tempo(){
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
@@ -62,9 +65,48 @@ int main(int arg, char *argv[]){
 	char message[2000];
 	time_t resp_t;
 
+	// Aguardando mensagem do cliente
+
+	// codigos : aviao detectado 				 = 0
+	//			 atualizacao da posicao do aviao = 1
+	//			 
+	// estilo da mensagem : posicao x/posicao y/posicao z/tempo
+	// exemplo de mensagem : 0/55000.0/56000.0/500.0/10.0
+
+	projetil *p = NULL;
+
+	while(1){
+		char client_message[2000];
+
+		int read_size = recv(new_socket, client_message, 2000, 0);
+
+		if(read_size >= 0){
+			if(read_size == 0){
+				printf("Cliente desconectado\n");
+				break;
+			}
+
+			if(read_size < 0){
+        		printf("Falha no recv\n");
+        		break;
+    		}
+
+			if(client_message[0] == "0"){
+				//calcular pontos possiveis
+			}
+
+			if(client_message[0] == "1"){
+				//verificar se o aviao esta no ponto de disparo
+				//se sim, disparar
+				//p = projetil()
+				// criar tread para atualizar o projetil e verificar colisao
+			}
+		}
+	}
+
 	// Esperando entrada de texto do terminal;
 
-	for(fgets(message, 2000, stdin); strncmp(message, "close", 5) != 0; fgets(message, 2000, stdin), i++){
+	/*for(fgets(message, 2000, stdin); strncmp(message, "close", 5) != 0; fgets(message, 2000, stdin), i++){
 		char client_message[2000];
 
 		time(&resp_t);
@@ -121,7 +163,7 @@ int main(int arg, char *argv[]){
 	if(i > 0){
 		media_tempo /= i;
 		printf("media de tempo: %lf\n", media_tempo);
-	}
+	}*/
 
 	close(socket_desc);
 
