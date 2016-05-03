@@ -6,7 +6,7 @@ void atualizar_posicao(double tempo){
 	p->z = p->z_inicial + (p->velocidade_z * tempo) + (p->aceleracao * (tempo*tempo))/2;
 }
 
-void projetil_atualiza(projetil *p, double angulo_z, double angulo_xy){
+void projetil_atualiza(projetil *p, double velocidade_inicial, double angulo_z, double angulo_xy){
 	p->velocidade_z = velocidade_inicial * sin(angulo_z)
 	p->velocidade_x = velocidade_inicial * cos(angulo_z) * sin(angulo_xy)
 	p->velocidade_y = velocidade_inicial * cos(angulo_z) * cos(angulo_xy)
@@ -25,15 +25,17 @@ projetil *projetil_aloca(double x, double y, double z, double angulo_z, double a
 
 	p->aceleracao = -9.8;
 
-	projetil_atualiza(p, angulo_z, angulo_xy);
-
-	//struct timeval tv;
-	//gettimeofday(&tv, NULL);
-	//p->tempo = 0;
+	projetil_atualiza(p, velocidade_inicial, angulo_z, angulo_xy);
 
 	return p;
 }
 
+void projetil_dispara(projetil *p, double tempo){
+	p->tempo_de_disparo = tempo;
+}
+
 double tempo_projetil(projetil *p, double *ponto){
 	// calcula quanto tempo leva para chegar em um ponto;
+
+	return (ponto[1] - p->x_inicial)/p->velocidade_x;
 }

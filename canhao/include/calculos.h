@@ -21,4 +21,8 @@ typedef struct {
 }aviao;
 
 double calcula_velocidade(aviao *pomba);
-
+void calcula_pos_aviao(double *ponto, aviao *pomba, double angulo, double tempo);
+void ponto_alvo(double *ponto, avisao *pomba, double tempo);
+double calcula_tempo_projetil();
+double calcula_azemuth();
+double calcula_angulo_disparo();

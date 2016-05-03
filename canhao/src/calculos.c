@@ -23,9 +23,10 @@ void calcula_pos_aviao(double *ponto, aviao *pomba, double angulo, double tempo)
 
 	ponto[0] = pomba->pos_atux + (vx * tempo);
 	ponto[1] = pomba->pos_atuy + (vy * tempo);
+	ponto[2] = pombo->pos_atuz;
 }
 
-void ponto_alvo(double *ponto, avisao *pomba, double tempo){
+void ponto_alvo(double *ponto, aviao *pomba, double tempo){
 	//pegar coefeciente angular e linear
 
 	double a = (pomba->pos_atuy - pomba->pos_anty)/(pomba->pos_atux - pomba->pos_antx);
@@ -54,16 +55,10 @@ void ponto_alvo(double *ponto, avisao *pomba, double tempo){
 	calcula_pos_aviao(ponto, pomba, angulo_real, tempo);
 }
 
-double calcula_tempo_projetil(){
-
-}
-
-
 double calcula_azemuth(){
 
 }
 
-double calcula_angulo_disparo(){
-
+double calcula_angulo_disparo(projetil *p, double tempo){
+	
 }
-

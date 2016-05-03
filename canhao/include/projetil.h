@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <time.h>nmm
+#include <time.h>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -16,4 +16,7 @@ typedef struct {
 } projetil;
 
 projetil *projetil_aloca(double x, double y, double z, double angulo_z, double angulo_xy, double velocidade_inicial);
-void atualizar_posicao();
+void atualizar_posicao(double tempo);
+void projetil_atualiza(projetil *p, double angulo_z, double angulo_xy);
+double tempo_projetil(projetil *p, double *ponto);
+void projetil_dispara(projetil *p, double tempo);
