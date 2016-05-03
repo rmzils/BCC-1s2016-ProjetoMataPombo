@@ -70,10 +70,28 @@ int main(int arg, char *argv[]){
 	// codigos : aviao detectado 				 = 0
 	//			 atualizacao da posicao do aviao = 1
 	//			 
-	// estilo da mensagem : posicao x/posicao y/posicao z/tempo
-	// exemplo de mensagem : 0/55000.0/56000.0/500.0/10.0
+	// estilo da mensagem : posicao x posicao y posicao z tempo
+	// exemplo de mensagem : 0 55000.0 56000.0 500.0 10.0
 
 	projetil *p = NULL;
+	aviao *pomba = malloc(sizeof(aviao));
+	int aviao_detectado = 0;
+	int tempo_disparo;
+	int projetil_count = 0;
+
+	double ponto_alvo[2];
+	
+	projetil *projeteis[4];
+
+	for(int i = 0; i < 4; i++)
+		projeteis[i] = NULL;
+
+	// FLAGS
+
+	int projetil_calculado = 0;
+	int espera_proximo_ponto = 1;
+
+	time(&resp_t);
 
 	while(1){
 		char client_message[2000];
@@ -81,25 +99,94 @@ int main(int arg, char *argv[]){
 		int read_size = recv(new_socket, client_message, 2000, 0);
 
 		if(read_size >= 0){
-			if(read_size == 0){
-				printf("Cliente desconectado\n");
-				break;
+			int tipo_mensagem;
+
+			sscanf(client_message, "%d", tipo_mensagem);
+
+			if(tipo_mensagem == "0"){
+				sscanf(client_message,"%lf %lf %lf %lf", pomba->pos_antx, pomba->pos_anty, pomba->pos_antz, pomba->tempo_ini);
+				pomba->velocidade = 0.0;
+				disparos = 4;
+
+				aviao_detectado = 1;
+				projetil_calculado = 0;
+				espera_proximo_ponto = 1;
 			}
 
-			if(read_size < 0){
-        		printf("Falha no recv\n");
-        		break;
-    		}
+			if(tipo_mensagem == "1"){
+				sscanf(client_message,"%lf %lf %lf %lf", pomba->pos_atux, pomba->pos_atuy, pomba->pos_atuz, pomba->tempo_atu);
 
-			if(client_message[0] == "0"){
-				//calcular pontos possiveis
+				pomba->velocidade = calcula_velocidade(pomba);
+
+				if(pomba->pos_antz != pomba->pos_atuz){
+					projetil_calculado = 0;
+					espera_proximo_ponto = 1;
+				}
+				else
+					espera_proximo_ponto = 0;
+
+				pomba->pos_antx = pomba->pos_atux;
+				pomba->pos_anty = pomba->pos_atuy;
+				pomba->pos_antz = pomba->pos_atuz;
+			}
+		}
+
+		if(disparos > 0 && aviao_detectado && !espera_proximo_ponto){
+			// calcula tempo que vai demorar pra pomba chegar no ponto e tempo que o projetil vai demorar
+
+			if(!projetil_calculado){
+				double tempo_inter = p->tempo_atu + 1.0;
+
+				while(1){
+
+
+					ponto_alvo(ponto_alvo, pomba, tempo_inter);
+
+					//calcula angulos
+
+					double angulo_azimuth;
+					double angulo_z;
+
+					projetil[projetil_count] = aloca_projetil(50000, 50000, 0, angulo_z, angulo_azimuth, 1175);
+
+					double tempo_projetil = tempo_projetil(projetil[projetil_count], ponto_alvo);
+
+					if(tempo_projetil > tempo_inter)
+						tempo_inter += 1.0;
+					else
+						break;
+				}
+
+				tempo_disparo = tempo() + tempo_inter - p->tempo_atu;
+
+				projetil_calculado = 1;
 			}
 
-			if(client_message[0] == "1"){
-				//verificar se o aviao esta no ponto de disparo
-				//se sim, disparar
-				//p = projetil()
-				// criar tread para atualizar o projetil e verificar colisao
+			else if(tempo() >= tempo_disparo){
+				//dispara, ou seja, cria thread do projetil
+
+				projetil_calculado = 0;
+				projetil_count--;
+			}
+		}
+
+		//verifica colisao
+		for(int i = 0; i < 4; i++){
+			if(projeteis[i] != NULL){
+				if(colisao(projeteis[i], aviao, tempo())) {
+					// desaloca projeteis e manda msg para o cliente de aviao abatido
+
+					finaliza_aviao(projeteis);
+				}
+
+				else{
+					//verifica se projetil chegou no chao
+
+					if(projetil_faio(projeteis[i], tempo()){
+						free(projeteis[i]);
+						projeteis[i] = NULL;
+					}
+				}
 			}
 		}
 	}

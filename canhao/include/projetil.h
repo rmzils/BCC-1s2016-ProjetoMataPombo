@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <time.h>
+#include <time.h>nmm
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
