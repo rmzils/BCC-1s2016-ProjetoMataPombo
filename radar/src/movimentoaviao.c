@@ -4,29 +4,46 @@
 #include <math.h>
 #include <string.h>
 #include <math.h>
+#include <sys/time.h>
 
 #include "definicoes.h"
 #include "estatistica.h"
 #include "aviao.h"
 
 //------------------------------------------------------------------------------
+double horarioPonto(){
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return tv.tv_sec + tv.tv_usec/1e6;
+}
+
+//------------------------------------------------------------------------------
 char* strInfPombo( aviao *pombo, movimentoAviao *movimentoPombo ){
 
+  float horario;
   char *strMensagem = "";
   strMensagem = malloc( 100 * sizeof (char) );
   strMensagem[0] = '\0';
-  char strPX[60], strPY[60], strPZ[60];
+  char strPX[60], strPY[60], strPZ[60], strHorario[60];
 
   sprintf(strPX, "%.7f", pombo->posX);
   sprintf(strPY, "%.7f", pombo->posY);
   sprintf(strPZ, "%.7f", pombo->posZ);
 
   strcat(strMensagem, strPX);
-  strcat(strMensagem, "#");
+  strcat(strMensagem, " ");
   strcat(strMensagem, strPY);
-  strcat(strMensagem, "#");
+  strcat(strMensagem, " ");
   strcat(strMensagem, strPZ);
-  strcat(strMensagem, "#");
+  strcat(strMensagem, " ");
+
+  struct timeval tv;
+	gettimeofday(&tv, NULL);
+	horario = tv.tv_sec + tv.tv_usec/1e6;
+
+  sprintf(strHorario, "%f", horario);
+  strcat(strMensagem, strHorario);
+  strcat(strMensagem, " ");
 
   return strMensagem;
 }
@@ -38,7 +55,6 @@ void calcularPontoAdjacente( aviao *pombo, movimentoAviao *movimentoPombo ){
 
   pombo->posX = movimentoPombo->pontoHipotenusa[0];
   pombo->posY = movimentoPombo->pontoHipotenusa[1];
-
 }
 
 //------------------------------------------------------------------------------
