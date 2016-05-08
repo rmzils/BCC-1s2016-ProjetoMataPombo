@@ -1,5 +1,4 @@
 #include "calculos.h"
-#include "projetil.h"
 
 void calcula_velocidade(aviao *pomba){
 	double difx = pomba->pos_antx - pomba->pos_atux;
@@ -59,6 +58,21 @@ double calcula_azemuth(){
 
 }
 
-double calcula_angulo_disparo(projetil *p, double tempo){
-	
+double calcula_angulo_disparo(projetil *p, double *ponto, double tempo){
+	long double v2 = p->velocidade;
+	long double v4 = p->velocidade;
+
+	printf("%lf %lf\n", v2, v4);
+
+	double x = sqrt((ponto[0] * ponto[0]) + (ponto[1] + ponto[1]));
+
+	double teta = atan((v2 + sqrt(((v4 - p->aceleracao) * (p->aceleracao * pow(x, 2) + 2 * ponto[3] * v2))))/p->velocidade * x);
+
+	printf("%lf\n", teta);
+
+	return teta;
+}
+
+int colisao(projetil *p, aviao *pomba, double tempo){
+	//atualiza posicao pomba
 }

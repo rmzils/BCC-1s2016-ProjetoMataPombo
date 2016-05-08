@@ -8,8 +8,8 @@
 #include <time.h>
 #include <pthread.h>
 
-#include "calculos.h"
 #include "projetil.h"
+#include "calculos.h"
 
 double tempo(){
 	struct timeval tv;
@@ -17,7 +17,9 @@ double tempo(){
 	return tv.tv_sec + tv.tv_usec/1e6;
 }
 
-void 
+void finaliza_aviao(){
+	//envia msg para cliente falando que derrubou a pomba
+}
 
 int main(int arg, char *argv[]){
 	int socket_desc, new_socket, c;
@@ -76,7 +78,7 @@ int main(int arg, char *argv[]){
 	aviao *pomba = malloc(sizeof(aviao));
 	int aviao_detectado = 0;
 	int tempo_disparo;
-	int projetil_count = 0;
+	int projetil_count = 4;
 	
 	projetil *projeteis[4];
 
@@ -96,20 +98,20 @@ int main(int arg, char *argv[]){
 		if(read_size >= 0){
 			int tipo_mensagem;
 
-			sscanf(client_message, "%d", tipo_mensagem);
+			sscanf(client_message, "%d", &tipo_mensagem);
 
-			if(tipo_mensagem == "0"){
-				sscanf(client_message,"%lf %lf %lf %lf", pomba->pos_antx, pomba->pos_anty, pomba->pos_antz, pomba->tempo_ini);
+			if(tipo_mensagem == 0){
+				sscanf(client_message,"%lf %lf %lf %lf", &pomba->pos_antx, &pomba->pos_anty, &pomba->pos_antz, &pomba->tempo_ini);
 				pomba->velocidade = 0.0;
-				disparos = 4;
+				projetil_count = 4;
 
 				aviao_detectado = 1;
 				projetil_calculado = 0;
 				espera_proximo_ponto = 1;
 			}
 
-			if(tipo_mensagem == "1"){
-				sscanf(client_message,"%lf %lf %lf %lf", pomba->pos_atux, pomba->pos_atuy, pomba->pos_atuz, pomba->tempo_atu);
+			if(tipo_mensagem == 1){
+				sscanf(client_message,"%lf %lf %lf %lf", &pomba->pos_atux, &pomba->pos_atuy, &pomba->pos_atuz, &pomba->tempo_atu);
 
 				pomba->velocidade = calcula_velocidade(pomba);
 
@@ -126,12 +128,13 @@ int main(int arg, char *argv[]){
 			}
 		}
 
-		if(disparos > 0 && aviao_detectado && !espera_proximo_ponto){
+		if(projetil_count > 0 && aviao_detectado && !espera_proximo_ponto){
 			// calcula tempo que vai demorar pra pomba chegar no ponto e tempo que o projetil vai demorar
 
 			if(!projetil_calculado){
-				double tempo_inter = p->tempo_atu + 0.5;
+				double tempo_inter = pomba->tempo_atu + 0.5;
 				double ponto[3];
+				double tempo_p;
 
 				while(1){
 					ponto_alvo(ponto, pomba, tempo_inter);
@@ -141,20 +144,20 @@ int main(int arg, char *argv[]){
 					double angulo_azimuth;
 					double angulo_z = calcula_angulo_disparo(projeteis[projetil_count], ponto);
 
-					if(projetil[projetil_count] != NULL)
-						projetil[projetil_count] = aloca_projetil(50000, 50000, 0, angulo_z, angulo_azimuth, 1175);
+					if(projeteis[projetil_count] != NULL)
+						projeteis[projetil_count] = projetil_aloca(50000, 50000, 0, angulo_z, angulo_azimuth, 1175);
 					else
-						atualiza
+						projetil_atualiza(projeteis[projetil_count], angulo_z, angulo_azimuth);
 
-					double tempo_projetil = tempo_projetil(projetil[projetil_count], ponto, tempo_inter);
+					tempo_p = tempo_projetil(projeteis[projetil_count], ponto);
 
-					if(tempo_projetil > tempo_inter)
+					if(tempo_p > tempo_inter)
 						tempo_inter += 0.6;
 					else
 						break;
 				}
 
-				tempo_disparo = tempo() + tempo_inter - p->tempo_atu;
+				tempo_disparo = tempo() + tempo_inter - pomba->tempo_atu;
 
 				projetil_calculado = 1;
 			}
@@ -170,10 +173,14 @@ int main(int arg, char *argv[]){
 		//verifica colisao
 		for(int i = 0; i < 4; i++){
 			if(projeteis[i] != NULL){
-				if(colisao(projeteis[i], aviao, tempo())) {
+				if(colisao(projeteis[i], pomba, tempo())) {
 					// desaloca projeteis e manda msg para o cliente de aviao abatido
 
-					finaliza_aviao(projeteis);
+					for(int i = 0; i < 4; i++)
+						if(projeteis[i] != NULL)
+							free(projeteis[i]);
+
+					finaliza_aviao();
 				}
 
 				else{
