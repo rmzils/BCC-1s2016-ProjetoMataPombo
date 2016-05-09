@@ -25,10 +25,12 @@ typedef struct {
 	double tempo_ini, tempo_atu;
 }aviao;
 
-double calcula_velocidade(aviao *pomba);
-void calcula_pos_aviao(double *ponto, aviao *pomba, double angulo, double tempo);
+void calcula_velocidade(aviao *pomba);
+//void calcula_pos_aviao(double *ponto, aviao *pomba, double angulo, double tempo);
 void ponto_alvo(double *ponto, aviao *pomba, double tempo);
 double calcula_tempo_projetil();
 double calcula_azemuth();
 double calcula_angulo_disparo();
 int colisao(projetil *p, aviao *pomba, double tempo);
+
+#endif

@@ -17,8 +17,12 @@ double tempo(){
 	return tv.tv_sec + tv.tv_usec/1e6;
 }
 
+void *projetil_handler(void *p);
+
 void finaliza_aviao(){
 	//envia msg para cliente falando que derrubou a pomba
+
+
 }
 
 int main(int arg, char *argv[]){
@@ -119,7 +123,7 @@ int main(int arg, char *argv[]){
 
 				printf("aviao: %lf %lf %lf %lf", pomba->pos_atux, pomba->pos_atuy, pomba->pos_atuz, pomba->tempo_atu);
 
-				pomba->velocidade = calcula_velocidade(pomba);
+				calcula_velocidade(pomba);
 
 				if(pomba->pos_antz != pomba->pos_atuz){
 					projetil_calculado = 0;
@@ -137,17 +141,19 @@ int main(int arg, char *argv[]){
 		if(projetil_count > 0 && aviao_detectado && !espera_proximo_ponto){
 			// calcula tempo que vai demorar pra pomba chegar no ponto e tempo que o projetil vai demorar
 
-			if(!projetil_calculado){
+			if(!projetil_calculado && pomba->pos_atuz == 200.0){
 				double tempo_inter = pomba->tempo_atu + 0.5;
 				double ponto[3];
 				double tempo_p;
+
+				printf("calculando ponto\n");
 
 				while(1){
 					ponto_alvo(ponto, pomba, tempo_inter);
 
 					//calcula angulos
 
-					double angulo_azimuth;
+					double angulo_azimuth = 0.0;
 					double angulo_z = calcula_angulo_disparo(projeteis[projetil_count], ponto);
 
 					if(projeteis[projetil_count] != NULL)
@@ -157,7 +163,7 @@ int main(int arg, char *argv[]){
 
 					tempo_p = tempo_projetil(projeteis[projetil_count], ponto);
 
-					if(tempo_p > tempo_inter)
+					if(distancia_ponto(projeteis[projetil_count], ponto) <= 4000.0 && tempo_p > tempo_inter)
 						tempo_inter += 0.6;
 					else
 						break;
@@ -166,10 +172,21 @@ int main(int arg, char *argv[]){
 				tempo_disparo = tempo() + tempo_inter - pomba->tempo_atu;
 
 				projetil_calculado = 1;
+
+				printf("ponto calculado\n");
 			}
 
-			else if(tempo() >= tempo_disparo){
+			else if(pomba->pos_atuz == 200.0 && tempo() >= tempo_disparo){
 				//dispara, ou seja, cria thread do projetil
+
+				projetil_dispara(projeteis[projetil_count], tempo());
+
+				pthread_t sniffer_thread;
+
+				if(pthread_create(&sniffer_thread, NULL, projetil_handler, projeteis[projetil_count]) < 0){
+            		perror("could not create thread");
+            		return 1;
+        		}
 
 				projetil_calculado = 0;
 				projetil_count--;
@@ -202,6 +219,16 @@ int main(int arg, char *argv[]){
 	}
 
 	close(socket_desc);
+
+	return 0;
+}
+
+void *projetil_handler(void *p){
+	projetil proj = *(projetil*)p;
+
+	atualizar_posicao(&proj, tempo());
+
+	printf("x: %lf y:%lf z:%lf\n", proj.x, proj.y, proj.z);
 
 	return 0;
 }

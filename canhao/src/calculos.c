@@ -16,53 +16,32 @@ void calcula_velocidade(aviao *pomba){
 	pomba->velocidade = hipo/tempo;
 }
 
-void calcula_pos_aviao(double *ponto, aviao *pomba, double angulo, double tempo){
-	double vx = pomba->velocidade * sin(angulo);
-	double vy = pomba->velocidade * cos(angulo);
-
-	ponto[0] = pomba->pos_atux + (vx * tempo);
-	ponto[1] = pomba->pos_atuy + (vy * tempo);
-	ponto[2] = pombo->pos_atuz;
-}
-
 void ponto_alvo(double *ponto, aviao *pomba, double tempo){
-	//pegar coefeciente angular e linear
-
-	double a = (pomba->pos_atuy - pomba->pos_anty)/(pomba->pos_atux - pomba->pos_antx);
-
-	double b = pomba->pos_atuy - (a * pomba->pos_atux);
-
-	// econtrar o quadrante da reta
-
-	int quadrante = 0;
-
-	// calcular o angulo
-
-	double angulo;
-
-	double angulo_real;
-
-	if(quadrante == 0)
-		angulo_real = angulo;
-	else if(quadrante == 1)
-		angulo_real = 180 - angulo;
-	else if(quadrante == 2)
-		angulo_real = 270 - angulo;
-	else
-		angulo_real = 360 - angulo;
+	double vetorCatetoAdjacente[2];
+	double tempoAtual = pomba->tempo_atu;
 	
-	calcula_pos_aviao(ponto, pomba, angulo_real, tempo);
+	double tamanhoHipotenusa      = 0 + (pomba->velocidade * (tempoAtual - tempo));
+	double tamanhoCatetoAdjacente = tamanhoHipotenusa * cos( 0 );
+	float escalar = (sqrt((pomba->pos_atux - pomba->pos_antx)*(pomba->pos_atux - pomba->pos_antx) + (pomba->pos_atuy - pomba->pos_anty)*(pomba->pos_atuy - pomba->pos_anty)));
+    
+    vetorCatetoAdjacente[0] = ((pomba->pos_atux - pomba->pos_antx)/(escalar));
+    vetorCatetoAdjacente[1] = ((pomba->pos_atuy - pomba->pos_anty)/(escalar));
+	
+	ponto[0] = pomba->pos_antx + tamanhoCatetoAdjacente * vetorCatetoAdjacente[0];
+    ponto[1] = pomba->pos_anty + tamanhoCatetoAdjacente * vetorCatetoAdjacente[1];
+    ponto[2] = pomba->pos_atuz;
 }
-
-double calcula_azemuth(){
-
+double calcula_azemuth(projetil *p, aviao *pomba ){
+	double azimuth;
+	azimuth = atan( (p->x - pomba->pos_atux)/(p->y - pomba->pos_atuy) );
+	return azimuth;
 }
 
 double calcula_angulo_disparo(projetil *p, double *ponto, double tempo){
 	long double v2 = p->velocidade;
 	long double v4 = p->velocidade;
 
-	printf("%lf %lf\n", v2, v4);
+	printf("%Lf %Lf\n", v2, v4);
 
 	double x = sqrt((ponto[0] * ponto[0]) + (ponto[1] + ponto[1]));
 
@@ -75,4 +54,23 @@ double calcula_angulo_disparo(projetil *p, double *ponto, double tempo){
 
 int colisao(projetil *p, aviao *pomba, double tempo){
 	//atualiza posicao pomba
+
+	double dist_x = p->x - pomba->pos_atux;
+	if(dist_x < 0)
+		dist_x *= -1;
+
+	double dist_y = p->y - pomba->pos_atuy;
+	if(dist_y < 0)
+		dist_y *= -1;
+
+	double hipo_xy = sqrt(pow(dist_x, 2) + pow(dist_y, 2));
+
+	double dist_z = p->z - pomba->pos_atuz;
+	if(dist_z < 0)
+		dist_z *= -1;
+
+	if(sqrt(pow(hipo_xy, 2) + pow(dist_z, 2)) < 2.0)
+		return 1;
+	else
+		return 0;
 }
