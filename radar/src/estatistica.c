@@ -67,6 +67,9 @@ float randomAnguloDirecaoPombo(){
 //------------------------------------------------------------------------------
 void randomTrajetoriaAviao( aviao *pombo, movimentoAviao *movimentoPombo ){
 
+  int seed = time ( NULL );
+  srand ( seed );
+
   int tipoTrajetoria = (rand() % 2) + 1;
 
   if (tipoTrajetoria == 1) {
