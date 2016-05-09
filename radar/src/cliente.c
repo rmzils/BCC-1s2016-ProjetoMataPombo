@@ -32,7 +32,7 @@ int main(int argc, char *argv[]){
 		printf("Nao foi possivel criar o socket.\n");
 
     // Preparar o sockaddr_in /
-	server.sin_addr.s_addr = inet_addr("10.10.10.105"); /* IP do Host */
+	server.sin_addr.s_addr = inet_addr("192.168.33.169"); /* IP do Host */
 	server.sin_family = AF_INET; /* Familia do endereco usando: (ARPA INTERNET PROTOCOLS) */
 	server.sin_port = htons(8888); /* Numero da porta */
 
@@ -46,10 +46,11 @@ int main(int argc, char *argv[]){
 
 	printf("Conectado\n");
 
-	close(socket_desc);
+	// close(socket_desc);
 
 	aviao pombo;
 	movimentoAviao movimentoPombo;
+	pombo.primeiraVez = '0';
 
 	//angulo e posição do pombo
 	randomPosicaoAviao(&pombo, &movimentoPombo);
@@ -77,7 +78,7 @@ int main(int argc, char *argv[]){
 				printf("%.5f\n", pombo.tempoDeVoo );
 				tempoAntigo = tempoNovo;
 				tempoNovo = tempo();
-				strMensagem = strInfPombo( &pombo, &movimentoPombo );
+				strMensagem = strInfPombo( &pombo, &movimentoPombo, tempoNovo );
 				printf("Mensagem: %s\n\n\n", strMensagem);
 				free(strMensagem);
 				calculandoProximoPonto(&pombo, &movimentoPombo);
@@ -89,7 +90,8 @@ int main(int argc, char *argv[]){
 				printf("velc: %.2f - tipo traj: %d\n", pombo.velocidade, pombo.tipoTrajetoria);;
 				printf("############################################################\n\n");
 
-				write(sock, strMensagem, strlen(strMensagem));
+				write(socket_desc, strMensagem, strlen(strMensagem));
+				pombo.primeiraVez = '1';
 			}
 		}
 	}

@@ -10,26 +10,24 @@
 #include "estatistica.h"
 #include "aviao.h"
 
-//------------------------------------------------------------------------------
-double horarioPonto(){
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	return tv.tv_sec + tv.tv_usec/1e6;
-}
 
 //------------------------------------------------------------------------------
-char* strInfPombo( aviao *pombo, movimentoAviao *movimentoPombo ){
+char* strInfPombo( aviao *pombo, movimentoAviao *movimentoPombo, double tempo ){
 
-  float horario;
+  // float horario;
   char *strMensagem = "";
   strMensagem = malloc( 100 * sizeof (char) );
   strMensagem[0] = '\0';
-  char strPX[60], strPY[60], strPZ[60], strHorario[60];
+  char strPX[60], strPY[60], strPZ[60], strHorario[60], strVelocidade[60];
 
   sprintf(strPX, "%.7f", pombo->posX);
   sprintf(strPY, "%.7f", pombo->posY);
   sprintf(strPZ, "%.7f", pombo->posZ);
+	sprintf(strVelocidade, "%.7f", pombo->velocidade);
 
+
+	strcat(strMensagem, &pombo->primeiraVez);
+	strcat(strMensagem, " ");
   strcat(strMensagem, strPX);
   strcat(strMensagem, " ");
   strcat(strMensagem, strPY);
@@ -37,13 +35,11 @@ char* strInfPombo( aviao *pombo, movimentoAviao *movimentoPombo ){
   strcat(strMensagem, strPZ);
   strcat(strMensagem, " ");
 
-  struct timeval tv;
-	gettimeofday(&tv, NULL);
-	horario = tv.tv_sec + tv.tv_usec/1e6;
+	strcat(strMensagem, strVelocidade);
+	strcat(strMensagem, " ");
 
-  sprintf(strHorario, "%f", horario);
+  sprintf(strHorario, "%f", tempo);
   strcat(strMensagem, strHorario);
-  strcat(strMensagem, " ");
 
   return strMensagem;
 }
