@@ -9,6 +9,7 @@ typedef struct {
   int tipoTrajetoria;
   float tempoMudancaTrajetoria;
   float tempoDeVoo;
+  int atacou;
 }aviao;
 
 #endif

@@ -49,12 +49,30 @@ char* strInfPombo( aviao *pombo, movimentoAviao *movimentoPombo ){
 }
 
 //------------------------------------------------------------------------------
+void verificaDistanciaRadarAtacado(aviao *pombo, movimentoAviao *movimentoPombo){
+	float tamanhoDistancia;
+	tamanhoDistancia = (sqrt(((pombo->posX - POSXRADAR)*(pombo->posX - POSXRADAR))+((pombo->posY - POSYRADAR)*(pombo->posY - POSYRADAR))));
+	if ( tamanhoDistancia < 1000 ){
+		if ( pombo->tipoTrajetoria == 1 ){
+			pombo->atacou = 1;
+		} else{
+			pombo->atacou = 0;
+		}
+	} else {
+		pombo->atacou = 0;
+	}
+	printf("Distancia ataque: %f\n", tamanhoDistancia );
+}
+
+//------------------------------------------------------------------------------
 void calcularPontoAdjacente( aviao *pombo, movimentoAviao *movimentoPombo ){
   movimentoPombo->pontoHipotenusa[0] = movimentoPombo->pontoCatetos[0] + movimentoPombo->tamanhoCatetoOposto * movimentoPombo->vetorCatetoOposto[0];
   movimentoPombo->pontoHipotenusa[1] = movimentoPombo->pontoCatetos[1] + movimentoPombo->tamanhoCatetoOposto * movimentoPombo->vetorCatetoOposto[1];
 
   pombo->posX = movimentoPombo->pontoHipotenusa[0];
   pombo->posY = movimentoPombo->pontoHipotenusa[1];
+
+	verificaDistanciaRadarAtacado( pombo, movimentoPombo);
 }
 
 //------------------------------------------------------------------------------
@@ -84,6 +102,7 @@ void calcularPontoCatetos( aviao *pombo, movimentoAviao *movimentoPombo ){
     movimentoPombo->pontoHipotenusa[1] = movimentoPombo->pontoCatetos[1];
     pombo->posX = movimentoPombo->pontoHipotenusa[0];
     pombo->posY = movimentoPombo->pontoHipotenusa[1];
+		verificaDistanciaRadarAtacado( pombo, movimentoPombo);
     return;
   }
 

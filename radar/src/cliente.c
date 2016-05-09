@@ -43,6 +43,10 @@ int main(int argc, char *argv[]){
 				printf("ACABOOOU!\n");
 			}
 			else {
+				if( pombo.atacou == 1 ){
+					printf("ATACOU! Perdemos conexão com o servidor! :/\n");
+					return 0;
+				}
 				system("clear");
 				pombo.tempoDeVoo += tempoNovo - tempoAntigo;
 				printf("%.5f\n", pombo.tempoDeVoo );

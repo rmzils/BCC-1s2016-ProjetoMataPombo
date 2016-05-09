@@ -4,6 +4,6 @@
 #define RAIO 10000
 #define POSXRADAR 50000
 #define POSYRADAR 50000
-#define TOLERANCIA 0.2
+#define TOLERANCIA 0.001
 
 #endif
