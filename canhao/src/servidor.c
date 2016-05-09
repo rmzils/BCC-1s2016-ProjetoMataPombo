@@ -101,6 +101,8 @@ int main(int arg, char *argv[]){
 			sscanf(client_message, "%d", &tipo_mensagem);
 
 			if(tipo_mensagem == 0){
+				printf("primeira vez\n");
+
 				sscanf(client_message,"%lf %lf %lf %lf", &pomba->pos_antx, &pomba->pos_anty, &pomba->pos_antz, &pomba->tempo_ini);
 				pomba->velocidade = 0.0;
 				projetil_count = 4;
@@ -111,7 +113,11 @@ int main(int arg, char *argv[]){
 			}
 
 			if(tipo_mensagem == 1){
+				printf("segunda vez ou +\n");
+
 				sscanf(client_message,"%lf %lf %lf %lf", &pomba->pos_atux, &pomba->pos_atuy, &pomba->pos_atuz, &pomba->tempo_atu);
+
+				printf("aviao: %lf %lf %lf %lf", pomba->pos_atux, pomba->pos_atuy, pomba->pos_atuz, pomba->tempo_atu);
 
 				pomba->velocidade = calcula_velocidade(pomba);
 
