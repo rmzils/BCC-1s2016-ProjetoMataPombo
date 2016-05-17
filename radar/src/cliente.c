@@ -32,7 +32,8 @@ int main(int argc, char *argv[]){
 		printf("Nao foi possivel criar o socket.\n");
 
     // Preparar o sockaddr_in /
-	server.sin_addr.s_addr = inet_addr("192.168.33.169"); /* IP do Host */
+
+	server.sin_addr.s_addr = INADDR_ANY;//inet_addr("192.168.34.214"); /* IP do Host */
 	server.sin_family = AF_INET; /* Familia do endereco usando: (ARPA INTERNET PROTOCOLS) */
 	server.sin_port = htons(8888); /* Numero da porta */
 
@@ -59,6 +60,8 @@ int main(int argc, char *argv[]){
 	tempoAntigo = tempo();
 
 	char *strMensagem;
+
+	srand(time(NULL));
 
 	while (1) {
 		tempoNovo = tempo();

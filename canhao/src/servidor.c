@@ -21,7 +21,7 @@ void *projetil_handler(void *p);
 
 void finaliza_aviao(){
 	//envia msg para cliente falando que derrubou a pomba
-
+	exit(EXIT_FAILURE);
 
 }
 
@@ -76,12 +76,13 @@ int main(int arg, char *argv[]){
 	// codigos : aviao detectado 				 = 0
 	//			 atualizacao da posicao do aviao = 1
 	//			 
-	// estilo da mensagem : posicao x posicao y posicao z tempo
-	// exemplo de mensagem : 0 55000.0 56000.0 500.0 10.0
+	// estilo da mensagem : posicao x posicao y posicao z velocidade tempo
+	// exemplo de mensagem : 0 55000.0 56000.0 500.0 100.0 10.0
 
 	aviao *pomba = malloc(sizeof(aviao));
 	int aviao_detectado = 0;
-	int tempo_disparo;
+	double tempo_p, tempo_a;
+	double tempo_disparo;
 	int projetil_count = 4;
 	
 	projetil *projeteis[4];
@@ -93,6 +94,7 @@ int main(int arg, char *argv[]){
 
 	int projetil_calculado = 0;
 	int espera_proximo_ponto = 1;
+	int intervalo = 0.0;
 
 	while(1){
 		char client_message[2000];
@@ -104,10 +106,12 @@ int main(int arg, char *argv[]){
 
 			sscanf(client_message, "%d", &tipo_mensagem);
 
-			if(tipo_mensagem == 0){
-				printf("primeira vez\n");
+			//printf("tipo_mensagem: %d\n", tipo_mensagem);
 
-				sscanf(client_message,"%lf %lf %lf %lf", &pomba->pos_antx, &pomba->pos_anty, &pomba->pos_antz, &pomba->tempo_ini);
+			if(tipo_mensagem == 0){
+				//printf("primeira vez\n");
+
+				sscanf(client_message,"%d %lf %lf %lf %lf %lf", &tipo_mensagem, &pomba->pos_atux, &pomba->pos_atuy, &pomba->pos_atuz, &pomba->velocidade, &pomba->tempo_ini);
 				pomba->velocidade = 0.0;
 				projetil_count = 4;
 
@@ -117,13 +121,19 @@ int main(int arg, char *argv[]){
 			}
 
 			if(tipo_mensagem == 1){
-				printf("segunda vez ou +\n");
+				//printf("segunda vez ou +\n");
 
-				sscanf(client_message,"%lf %lf %lf %lf", &pomba->pos_atux, &pomba->pos_atuy, &pomba->pos_atuz, &pomba->tempo_atu);
+				pomba->pos_antx = pomba->pos_atux;
+				pomba->pos_anty = pomba->pos_atuy;
+				pomba->pos_antz = pomba->pos_atuz;
 
-				printf("aviao: %lf %lf %lf %lf", pomba->pos_atux, pomba->pos_atuy, pomba->pos_atuz, pomba->tempo_atu);
+				sscanf(client_message,"%d %lf %lf %lf %lf %lf", &tipo_mensagem, &pomba->pos_atux, &pomba->pos_atuy, &pomba->pos_atuz, &pomba->velocidade, &pomba->tempo_atu);
 
-				calcula_velocidade(pomba);
+				//printf("aviao: %lf %lf %lf %lf\n", pomba->pos_atux, pomba->pos_atuy, pomba->pos_atuz, pomba->tempo_atu);
+
+				//calcula_velocidade(pomba);
+
+				//printf("velocidade: %lf\n", pomba->velocidade);
 
 				if(pomba->pos_antz != pomba->pos_atuz){
 					projetil_calculado = 0;
@@ -131,62 +141,74 @@ int main(int arg, char *argv[]){
 				}
 				else
 					espera_proximo_ponto = 0;
-
-				pomba->pos_antx = pomba->pos_atux;
-				pomba->pos_anty = pomba->pos_atuy;
-				pomba->pos_antz = pomba->pos_atuz;
 			}
 		}
 
 		if(projetil_count > 0 && aviao_detectado && !espera_proximo_ponto){
 			// calcula tempo que vai demorar pra pomba chegar no ponto e tempo que o projetil vai demorar
 
-			if(!projetil_calculado && pomba->pos_atuz == 200.0){
+			if(!projetil_calculado && pomba->pos_atuz == 200.0 && tempo() > intervalo){
+
 				double tempo_inter = pomba->tempo_atu + 0.5;
 				double ponto[3];
-				double tempo_p;
-
-				printf("calculando ponto\n");
 
 				while(1){
 					ponto_alvo(ponto, pomba, tempo_inter);
 
+					//printf("x:%lf y:%lf z:%lf\n", ponto[0], ponto[1], ponto[2]);
+
 					//calcula angulos
 
-					double angulo_azimuth = 0.0;
-					double angulo_z = calcula_angulo_disparo(projeteis[projetil_count], ponto);
+					if(projeteis[projetil_count - 1] == NULL){
+						projeteis[projetil_count - 1] = projetil_aloca(50000, 50000, 0, 0.0, 0.0, 1175);
+					}
 
-					if(projeteis[projetil_count] != NULL)
-						projeteis[projetil_count] = projetil_aloca(50000, 50000, 0, angulo_z, angulo_azimuth, 1175);
-					else
-						projetil_atualiza(projeteis[projetil_count], angulo_z, angulo_azimuth);
+					double angulo_azemuth = calcula_azemuth(projeteis[projetil_count - 1], pomba);
+					double angulo_z = calcula_angulo_disparo(projeteis[projetil_count - 1], ponto, tempo_inter);
 
-					tempo_p = tempo_projetil(projeteis[projetil_count], ponto);
+					//printf("azemuth: %lf\n", angulo_azemuth);
+					//printf("angulo z: %lf\n", angulo_z);
 
-					if(distancia_ponto(projeteis[projetil_count], ponto) <= 4000.0 && tempo_p > tempo_inter)
-						tempo_inter += 0.6;
+					projetil_atualiza(projeteis[projetil_count - 1], angulo_z, angulo_azemuth);
+
+					tempo_p = tempo_projetil(projeteis[projetil_count - 1], ponto);
+					tempo_a = tempo_aviao(ponto, pomba);
+
+					//printf("tempo_projetil: %lf, tempo_aviao: %lf\n", tempo_p, tempo_a);
+
+
+					if(distancia_ponto(projeteis[projetil_count - 1], ponto) > 4000.0 || tempo_p > tempo_inter)
+						tempo_inter += 0.5;
 					else
 						break;
 				}
 
-				tempo_disparo = tempo() + tempo_inter - pomba->tempo_atu;
+				printf("ponto: x:%lf y:%lf z:%lf\n", ponto[0], ponto[1], ponto[2]);
+
+				tempo_disparo = tempo() + tempo_a - tempo_p;
+
+				printf("tempo_disparo: %lf\n", tempo_disparo);
 
 				projetil_calculado = 1;
-
-				printf("ponto calculado\n");
 			}
 
-			else if(pomba->pos_atuz == 200.0 && tempo() >= tempo_disparo){
+			else if(projetil_calculado && pomba->pos_atuz == 200.0 && tempo() >= tempo_disparo && projetil_count > 3){
 				//dispara, ou seja, cria thread do projetil
 
-				projetil_dispara(projeteis[projetil_count], tempo());
+				printf("vai disparar projetil: %d\n", projetil_count);
 
-				pthread_t sniffer_thread;
+				projetil_dispara(projeteis[projetil_count - 1], tempo());
 
-				if(pthread_create(&sniffer_thread, NULL, projetil_handler, projeteis[projetil_count]) < 0){
-            		perror("could not create thread");
-            		return 1;
-        		}
+				printf("disparou\n");
+
+				intervalo = tempo() + 2.0;
+
+				/*pthread_t sniffer_thread;
+
+				if(pthread_create(&sniffer_thread, NULL, projetil_handler, projeteis[projetil_count - 1]) < 0){
+	            	perror("could not create thread");
+	            	return 1;
+	        	}*/
 
 				projetil_calculado = 0;
 				projetil_count--;
@@ -194,25 +216,37 @@ int main(int arg, char *argv[]){
 		}
 
 		//verifica colisao
+
+		//system("clear");
+
 		for(int i = 0; i < 4; i++){
-			if(projeteis[i] != NULL){
-				if(colisao(projeteis[i], pomba, tempo())) {
+			if(projeteis[i] != NULL && projeteis[i]->tempo_de_disparo > 0){
+				//printf("calculando colisao\n");
+
+				atualizar_posicao(projeteis[i], tempo());
+
+				printf("projetil %d:\n", i+1);
+
+				if(colisao(projeteis[i], pomba, tempo())){
+					printf("colidiu\n");
 					// desaloca projeteis e manda msg para o cliente de aviao abatido
 
-					for(int i = 0; i < 4; i++)
-						if(projeteis[i] != NULL)
-							free(projeteis[i]);
+					for(int j = 0; j < 4; j++){
+						printf("vai desalocar projetil %d\n", j);
+						if(projeteis[j] != NULL){
+							free(projeteis[j]);
+							projeteis[j] = NULL;
+
+							printf("desalocou projetil\n");
+						}
+					}
 
 					finaliza_aviao();
 				}
 
-				else{
-					//verifica se projetil chegou no chao
-
-					if(projeteis[i]->z < 0){
-						free(projeteis[i]);
-						projeteis[i] = NULL;
-					}
+				if(projeteis[i]->z < 0){
+					free(projeteis[i]);
+					projeteis[i] = NULL;
 				}
 			}
 		}
@@ -223,12 +257,11 @@ int main(int arg, char *argv[]){
 	return 0;
 }
 
-void *projetil_handler(void *p){
+/*void *projetil_handler(void *p){
 	projetil proj = *(projetil*)p;
 
-	atualizar_posicao(&proj, tempo());
-
-	printf("x: %lf y:%lf z:%lf\n", proj.x, proj.y, proj.z);
+	while(proj.z >= 0.0)
+		atualizar_posicao(&proj, tempo());
 
 	return 0;
-}
+}*/
