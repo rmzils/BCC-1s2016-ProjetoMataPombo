@@ -84,7 +84,7 @@ double calcula_angulo_disparo(projetil *p, double *ponto, double tempo){
 
 	double teta = atan((v2 - sqrt(v4 - (aceleracao_kh * ((aceleracao_kh * pow(x,2)) + (2 * y * v2)))))/(aceleracao_kh * x));
 
-	printf("sen:%lf cos:%lf\n", sin(teta), cos(teta));
+	//printf("sen:%lf cos:%lf\n", sin(teta), cos(teta));
 
 	return teta;
 }
@@ -122,10 +122,30 @@ int colisao(projetil *p, aviao *pomba, double tempo){
 
 	double dist = sqrt(pow(hipo_xy, 2) + pow(dist_z, 2));
 
-	printf("x:%lf y:%lf z:%lf dist: %lf\n", p->x, p->y, p->z, dist);
+	//printf("%lf\n", dist);
 
 	if(dist < 2.0)
 		return 1;
 	else
 		return 0;
+}
+
+double ganbeta_dist(projetil *p, aviao *pomba, double tempo){
+	double dist_x = p->x - pomba->pos_atux;
+	if(dist_x < 0)
+		dist_x *= -1;
+
+	double dist_y = p->y - pomba->pos_atuy;
+	if(dist_y < 0)
+		dist_y *= -1;
+
+	double hipo_xy = sqrt(pow(dist_x, 2) + pow(dist_y, 2));
+
+	double dist_z = p->z - pomba->pos_atuz;
+	if(dist_z < 0)
+		dist_z *= -1;
+
+	double dist = sqrt(pow(hipo_xy, 2) + pow(dist_z, 2));
+
+	return dist;
 }

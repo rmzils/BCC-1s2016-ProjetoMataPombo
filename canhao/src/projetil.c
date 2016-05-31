@@ -3,7 +3,7 @@
 void atualizar_posicao(projetil *p, double tempo){
 	tempo -= p->tempo_de_disparo;
 
-	printf("%lf\n", tempo);
+	//printf("%lf\n", tempo);
 
 	p->x = p->x_inicial + (p->velocidade_x * tempo);
 	p->y = p->y_inicial + (p->velocidade_y * tempo);
@@ -17,7 +17,7 @@ void projetil_atualiza(projetil *p, double angulo_z, double angulo_xy){
 	p->velocidade_x = p->velocidade * cos(angulo_z) * sin(angulo_xy);
 	p->velocidade_y = p->velocidade * cos(angulo_z) * cos(angulo_xy);
 
-	printf("velocidade_z: %lf velocidade_x: %lf velocidade_y: %lf\n", p->velocidade_z, p->velocidade_x, p->velocidade_y);
+	//printf("velocidade_z: %lf velocidade_x: %lf velocidade_y: %lf\n", p->velocidade_z, p->velocidade_x, p->velocidade_y);
 }
 
 projetil *projetil_aloca(double x, double y, double z, double angulo_z, double angulo_xy, double velocidade_inicial){

@@ -33,5 +33,6 @@ double calcula_azemuth(projetil *p, aviao *pomba );
 double calcula_angulo_disparo(projetil *p, double *ponto, double tempo);
 int colisao(projetil *p, aviao *pomba, double tempo);
 double tempo_aviao(double *ponto, aviao *pomba);
+double ganbeta_dist(projetil *p, aviao *pomba, double tempo);
 
 #endif
