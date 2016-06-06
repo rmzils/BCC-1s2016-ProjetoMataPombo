@@ -18,9 +18,11 @@ char* strInfPombo( aviao *pombo, movimentoAviao *movimentoPombo, double tempo ){
   char *strMensagem = "";
   strMensagem = malloc( 100 * sizeof (char) );
   strMensagem[0] = '\0';
-  char strPX[60], strPY[60], strPZ[60], strHorario[60], strVelocidade[60], strTipo[1];
+  char strPX[60], strPY[60], strPZ[60], strHorario[60], strVelocidade[60], strTipo[60];
 
-  sprintf(strTipo, "%d", pombo->primeiraVez);
+  printf("dasdasdas\n");
+  sprintf(strTipo, "%c", pombo->primeiraVez);
+  printf("ffiiimms\n");
   sprintf(strPX, "%.7f", pombo->posX);
   sprintf(strPY, "%.7f", pombo->posY);
   sprintf(strPZ, "%.7f", pombo->posZ);
