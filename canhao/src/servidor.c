@@ -160,13 +160,21 @@ int main(int arg, char *argv[]){
 
 				if(pthread_create(&sniffer_thread, NULL, projetil_handler, projeteis[projetil_count - 1]) < 0){
 	    			perror("could not create thread");
-	    		return 1;
-	}
+	    			return 1;
+				}
+
+				projetil *p = projeteis[projetil_count - 1];
+
+				char msg_projetil[100];
+				sprintf(msg_projetil, "0 %lf %lf %lf %lf\n", p->velocidade_x, p->velocidade_y, p->velocidade_z, p->tempo_de_disparo);
+
+				write(socket_desc, msg_projetil, strlen(msg_projetil));
 
 				intervalo = tempo() + 2.0;
 
 				projetil_calculado = 0;
 				projetil_count--;
+
 			}
 		}
 	}
@@ -210,8 +218,11 @@ void *connection_handler(void *c){
 			sscanf(client_message, "%d", &tipo_mensagem);
 
 			if(tipo_mensagem == 0){
+				printf("caralho\n");
 				sscanf(client_message,"%d %lf %lf %lf %lf %lf", &tipo_mensagem, &pomba->pos_atux, &pomba->pos_atuy, &pomba->pos_atuz, &pomba->velocidade, &pomba->tempo_ini);
 				pomba->velocidade = 0.0;
+
+				printf("%d %lf %lf %lf %lf %lf\n", tipo_mensagem, pomba->pos_atux, pomba->pos_atuy, pomba->pos_atuz, pomba->velocidade, pomba->tempo_ini);
 
 				aviao_detectado = 1;
 				projetil_calculado = 0;

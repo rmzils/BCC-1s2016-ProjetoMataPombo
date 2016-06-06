@@ -57,7 +57,7 @@ void verificaDistanciaRadarAtacado(aviao *pombo, movimentoAviao *movimentoPombo)
 	} else {
 		pombo->atacou = 0;
 	}
-	printf("Distancia ataque: %f\n", tamanhoDistancia );
+	//printf("Distancia ataque: %f\n", tamanhoDistancia );
 }
 
 //------------------------------------------------------------------------------
