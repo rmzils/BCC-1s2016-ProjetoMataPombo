@@ -20,9 +20,7 @@ char* strInfPombo( aviao *pombo, movimentoAviao *movimentoPombo, double tempo ){
   strMensagem[0] = '\0';
   char strPX[60], strPY[60], strPZ[60], strHorario[60], strVelocidade[60], strTipo[60];
 
-  printf("dasdasdas\n");
   sprintf(strTipo, "%c", pombo->primeiraVez);
-  printf("ffiiimms\n");
   sprintf(strPX, "%.7f", pombo->posX);
   sprintf(strPY, "%.7f", pombo->posY);
   sprintf(strPZ, "%.7f", pombo->posZ);
