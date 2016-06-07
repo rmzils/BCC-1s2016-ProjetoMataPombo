@@ -122,7 +122,7 @@ int main(int arg, char *argv[]){
 						projeteis[projetil_count - 1] = projetil_aloca(50000, 50000, 0, 0.0, 0.0, 1175);
 					}
 
-					angulo_azemuth = calcula_azemuth(projeteis[projetil_count - 1], pomba);
+					angulo_azemuth = calcula_azemuth(projeteis[projetil_count - 1], ponto);
 					angulo_z = calcula_angulo_disparo(projeteis[projetil_count - 1], ponto, tempo_inter);
 
 					projetil_atualiza(projeteis[projetil_count - 1], angulo_z, angulo_azemuth);
@@ -235,6 +235,7 @@ void *connection_handler(void *c){
 				pomba->pos_antz = pomba->pos_atuz;
 
 				sscanf(client_message,"%d %lf %lf %lf %lf %lf", &tipo_mensagem, &pomba->pos_atux, &pomba->pos_atuy, &pomba->pos_atuz, &pomba->velocidade, &pomba->tempo_atu);
+				//printf("%d %lf %lf %lf %lf %lf\n", tipo_mensagem, pomba->pos_atux, pomba->pos_atuy, pomba->pos_atuz, pomba->velocidade, pomba->tempo_atu);
 				
 				if(pomba->pos_antz != pomba->pos_atuz){
 					projetil_calculado = 0;
@@ -256,10 +257,19 @@ void *connection_handler(void *c){
 void *projetil_handler(void *p){
 	projetil proj = *(projetil*)p;
 
+	double dist = 0, dist_ant = 10000;
+
 	while(proj.z >= 0.0){
 		atualizar_posicao(&proj, tempo());
 
-		if(colisao(&proj, pomba, tempo())){
+		dist = colisao(&proj, pomba, tempo());
+
+		if(dist < dist_ant)
+			dist_ant = dist;
+
+		printf("dist: %lf\n", dist_ant);
+
+		if(dist < 2.0){
 			finaliza_aviao();
 			break;
 		}

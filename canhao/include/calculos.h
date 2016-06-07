@@ -29,10 +29,9 @@ void calcula_velocidade(aviao *pomba);
 //void calcula_pos_aviao(double *ponto, aviao *pomba, double angulo, double tempo);
 void ponto_alvo(double *ponto, aviao *pomba, double tempo);
 double calcula_tempo_projetil();
-double calcula_azemuth(projetil *p, aviao *pomba );
+double calcula_azemuth(projetil *p, double *ponto);
 double calcula_angulo_disparo(projetil *p, double *ponto, double tempo);
-int colisao(projetil *p, aviao *pomba, double tempo);
+double colisao(projetil *p, aviao *pomba, double tempo);
 double tempo_aviao(double *ponto, aviao *pomba);
-double ganbeta_dist(projetil *p, aviao *pomba, double tempo);
 
 #endif

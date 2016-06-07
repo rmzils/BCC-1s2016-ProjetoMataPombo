@@ -17,6 +17,8 @@
 #include "estatistica.h"
 
 int aviao_abatido = 0;
+aviao pombo;
+projetil *projeteis[4];
 
 void *connection_handler(void *c);
 void *projetil_handler(void *p);
@@ -64,9 +66,11 @@ int main(int argc, char *argv[]){
 
 	// close(socket_desc);
 
-	aviao pombo;
 	movimentoAviao movimentoPombo;
 	pombo.primeiraVez = '0';
+
+	for(int i = 0; i < 4; i++)
+		projeteis[i] = NULL;
 
 	//angulo e posição do pombo
 	randomPosicaoAviao(&pombo, &movimentoPombo);
@@ -74,7 +78,7 @@ int main(int argc, char *argv[]){
 	double tempoNovo, tempoAntigo;
 	tempoAntigo = tempo();
 
-	char *strMensagem;
+	char strMensagem[100];
 
 	while (!aviao_abatido) {
 		tempoNovo = tempo();
@@ -89,22 +93,23 @@ int main(int argc, char *argv[]){
 					printf("ATACOU! Perdemos conexão com o servidor! :/\n");
 					return 0;
 				}
-				//system("clear");
+				system("clear");
 				pombo.tempoDeVoo += tempoNovo - tempoAntigo;
-				//printf("%.5f\n", pombo.tempoDeVoo );
+				printf("%.5f\n", pombo.tempoDeVoo );
 				tempoAntigo = tempoNovo;
 				tempoNovo = tempo();
-				strMensagem = strInfPombo( &pombo, &movimentoPombo, tempoNovo );
-				printf("Mensagem: %s\n\n\n", strMensagem);
-				free(strMensagem);
+				//strMensagem = //strInfPombo( &pombo, &movimentoPombo, tempoNovo );
+				sprintf(strMensagem, "%c %.7f %.7f %.7f %.7f %f\n", pombo.primeiraVez, pombo.posX, pombo.posY, pombo.posZ, pombo.velocidade, tempoNovo);
+				printf("vel: %lf\n", pombo.velocidade);
+				//free(strMensagem);
 				calculandoProximoPonto(&pombo, &movimentoPombo);
 
-				/*printf("############################################################\n");
+				printf("############################################################\n");
 				printf("Ponto Avião: %.3f - %.3f\n", movimentoPombo.pontoHipotenusa[0], movimentoPombo.pontoHipotenusa[1] );
 				printf("tempo mudanca: %f\n",pombo.tempoMudancaTrajetoria);
 				printf("pombo.anguloDirecao: %f\n",pombo.anguloDirecao );
 				printf("velc: %.2f - tipo traj: %d\n", pombo.velocidade, pombo.tipoTrajetoria);;
-				printf("############################################################\n\n");*/
+				printf("############################################################\n\n");
 
 				write(socket_desc, strMensagem, strlen(strMensagem));
 				pombo.primeiraVez = '1';
@@ -121,14 +126,21 @@ void *connection_handler(void *c){
 
 	printf("criou thread\n");
 
+	pthread_t sniffer_thread;
+
+	if(pthread_create(&sniffer_thread, NULL, projetil_handler, NULL) < 0){
+	    perror("could not create thread\n");
+	    return 0;
+	}
+
 	while(1){
 		char client_message[2000];
 
-		printf("carai1\n");
+		//printf("carai1\n");
 
 		int read_size = recv(sock, client_message, 2000, 0);
 
-		printf("carai2\n");
+		//printf("carai2\n");
 
 		if(read_size >= 0){
 			int tipo_mensagem;
@@ -138,19 +150,15 @@ void *connection_handler(void *c){
 			if(tipo_mensagem == 0){
 				projetil *p = malloc(sizeof(projetil));
 
-				sscanf(client_message,"%d %lf %lf %lf %lf\n", &tipo_mensagem, &p->velocidade_x, &p->velocidade_y, &p->velocidade_z, &p->tempo_de_disparo);
+				sscanf(client_message,"%d %lf %lf %lf %lf", &tipo_mensagem, &p->velocidade_x, &p->velocidade_y, &p->velocidade_z, &p->tempo_de_disparo);
+				//printf("%d %lf %lf %lf %lf\n", tipo_mensagem, p->velocidade_x, p->velocidade_y, p->velocidade_z, p->tempo_de_disparo);
 
 				p->x_inicial = 50000.0;
 				p->y_inicial = 50000.0;
 				p->z_inicial = 0.0;
 				p->aceleracao = -9.8;
 
-				pthread_t sniffer_thread;
-
-				if(pthread_create(&sniffer_thread, NULL, projetil_handler, p) < 0){
-	    			perror("could not create thread\n");
-	    			return 0;
-				}
+				//printf("criou thread\n");
 			}
 
 			if(tipo_mensagem == 1){
@@ -168,13 +176,37 @@ void *connection_handler(void *c){
 	return 0;
 }
 
-void *projetil_handler(void *p){
-	projetil proj = *(projetil*)p;
+double colisao(projetil *p, aviao *pomba, double tempo){
+	//atualiza posicao pomba
 
-	printf("Disparou! %lf %lf %lf %lf\n", proj.velocidade_x, proj.velocidade_y, proj.velocidade_z, proj.tempo_de_disparo);
+	double dist_x = p->x - pomba->posX;
+	if(dist_x < 0)
+		dist_x *= -1;
 
-	while(proj.z >= 0.0 && !aviao_abatido){
-		atualizar_posicao(&proj, tempo());
+	double dist_y = p->y - pomba->posY;
+	if(dist_y < 0)
+		dist_y *= -1;
+
+	double hipo_xy = sqrt(pow(dist_x, 2) + pow(dist_y, 2));
+
+	double dist_z = p->z - pomba->posZ;
+	if(dist_z < 0)
+		dist_z *= -1;
+
+	return sqrt(pow(hipo_xy, 2) + pow(dist_z, 2));
+}
+
+void *projetil_handler(){
+	while(1){
+		for(int i = 0; i < 4; i++){
+			projetil *p = projeteis[i];
+
+			if(p != NULL){
+				atualizar_posicao(p, tempo());
+
+				double dist = colisao(p, &pombo, tempo());
+			}
+		}
 	}
 
 	return 0;
